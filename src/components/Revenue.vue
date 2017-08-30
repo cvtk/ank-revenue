@@ -1,13 +1,13 @@
 <template>
-  <p :class="$style.p">/user</p>
+  <p>/revenue</p>
 </template>
 
 <style lang="scss" module>
-  .p { padding: 5px }
+  
 </style>
 
 <script>
   export default {
-    name: 'user'
+    name: 'revenue'
   }
 </script>
