@@ -9,10 +9,12 @@ const router = new VueRouter({
   linkActiveClass: '',
   linkExactActiveClass: '',
   routes: [
-    { path: '/', component: require('./components/Root.vue'), name: 'root' },
-    { path: '/users/:key', component: require('./components/User.vue'), name: 'user' },
-    { path: '/reports', component: require('./components/Reports.vue'), name: 'reports' },
-    { path: '/revenue', component: require('./components/Revenue.vue'), name: 'revenue' }
+    { path: '/', component: require('./components/Root.vue'), name: 'root', meta: { title: 'Главная' } },
+    { path: '/users/:key', component: require('./components/User.vue'), name: 'user', meta: { title: 'Пользователь' } },
+    { path: '/reports', component: require('./components/Reports.vue'), name: 'reports', meta: { title: 'Отчеты' } },
+    { path: '/revenue', component: require('./components/Revenue.vue'), name: 'revenue', meta: { title: 'Продажи' } },
+    { path: '/login', component: require('./components/Login.vue'), name: 'login', meta: { title: 'Войти' } },
+    { path: '/search', component: require('./components/Search.vue'), name: 'search', meta: { title: 'Поиск' } }
   ]
 });
 
