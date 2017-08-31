@@ -18,11 +18,17 @@
         </div>
       </div>
     </div>
+
+    <div :class="$style.revenue_component__create_sale" v-show="showSaleCreateForm">
+      <create-sale />
+    </div>
+    
     <div :class="$style.revenue_component__list_actions">
       <div :class="$style.list_actions">
-        <span :class="$style.list_actions__add_new">Добавить продажу</span>
+        <span :class="$style.list_actions__add_new" @click="showSaleCreateForm = !showSaleCreateForm">Добавить</span>
       </div>
     </div>
+
     <div :class="$style.revenue_component__items_list">
       <table :class="$style.items_list">
         <thead :class="$style.items_list__header">
@@ -46,10 +52,12 @@
   .revenue_component {
     background-color: #fff;
     padding: 15px 20px;
-    overflow: hidden;
     .revenue_component__tool_bar {
       &:after { @include clearfix }
-      margin-bottom: 10px;
+      padding-bottom: 10px;
+    }
+    .revenue_component__create_sale {
+      padding: 10px 0;
     }
     .revenue_component__list_actions {
       &:after { @include clearfix }
@@ -57,7 +65,7 @@
     }
     .revenue_component__items_list {
       &:after { @include clearfix }
-      margin: 10px 0;
+      padding: 10px 0;
     }
   }
 
@@ -179,13 +187,22 @@
       text-align: center;
       outline: 0;
       vertical-align: middle;
+      font-weight: 600;
     }
   }
 
 </style>
 
 <script>
+  import CreateSale from './revenue-component/create-sale.vue';
+
   export default {
-    name: 'revenue'
+    name: 'revenue',
+    components: { CreateSale },
+    data() {
+      return {
+        showSaleCreateForm: false
+      }
+    }
   }
 </script>
