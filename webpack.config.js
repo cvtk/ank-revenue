@@ -15,7 +15,7 @@ module.exports = {
         loader: 'vue-loader',
         options: {
           cssModules: {
-            localIdentName: '[hash:base64:2]'
+            localIdentName: '[hash:base64]'
           },
           loaders: {
             'scss': 'vue-style-loader!css-loader!sass-loader',
