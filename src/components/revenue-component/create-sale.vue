@@ -1,13 +1,6 @@
 <template>
   <div :class="$style.create_sale">
-    <input type="text" v-model="newSale.created" :class="$style.create_sale__input">
-    <input type="text" v-model="newSale.address" :class="$style.create_sale__input">
-    <input type="number" v-model="newSale.rooms" :class="$style.create_sale__input">
-    <input type="text" v-model="newSale.price" :class="$style.create_sale__input">
-    <input type="text" v-model="newSale.communal_included" :class="$style.create_sale__input">
-    <input type="text" v-model="newSale.commission" :class="$style.create_sale__input">
-    <input type="text" v-model="newSale.partner" :class="$style.create_sale__input">
-    <input type="text" v-model="newSale.emplyee" :class="$style.create_sale__input">
+    <sale-address-field />
   </div>
 </template>
 
@@ -29,8 +22,14 @@
 </style>
 
 <script>
+  import firebase from '../../firebase.js';
+  import SaleAddressField from './create-sale--address-field.vue';
+
+  const streetsRef = firebase.database().ref('streets');
+
   export default {
     name: 'create-sale',
+    components: { SaleAddressField },
     data() {
       return {
         newSale: {
