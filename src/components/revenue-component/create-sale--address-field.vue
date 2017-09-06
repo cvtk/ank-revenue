@@ -1,12 +1,17 @@
 <template>
   <div :class="$style.address_field">
-    <label for=""></label>
-    <input type="text" :class="$style.address_field__input" placeholder="Город" v-model="city.name" @keyup="cityAutocomplete()">
-    <input type="text" :class="$style.address_field__input" placeholder="Улица">
-    <input type="text" :class="$style.address_field__input" placeholder="Дом">
-    <div :class="$style.address_field__autocomplete_menu">
-      <ul :class="$style.autocomplete_menu">
-        <li :class="$style.autocomplete_menu__item" v-for="item in autocomplete">
+    <input type="text" :class="$style.address_field__input" 
+      :placeholder="label"
+      v-model="fieldValue"
+      @keypress="onTyping"
+      ref="addressField">
+    <div :class="$style.address_field__autocomplete_menu" v-if="searchResults.length > 0">
+      <ul :class="$style.autocomplete_menu" tabindex="0" ref="autocompleteMenu" @keypress="onArrowSelect">
+        <li :class="[ $style.autocomplete_menu__item, selectedItem === index && $style._active ]"
+          v-for="( item, index ) in searchResults"
+          :key="item.id"
+          @mouseover="selectedItem = index"
+          @click="selectedObject = item">
         {{ item.name }} (<span :class="$style._light">{{ item.type }}</span>
         <span :class="$style._light" v-for="parent in item.parents">, {{ parent.name }} {{ parent.typeShort }}</span>)
         </li>
@@ -45,16 +50,18 @@
     border: 1px solid #c2cad8;
     background-color: #fff;
     margin-top: -1px;
+    width: 280px;
     .autocomplete_menu__item {
       display: block;
       border: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
       color: #4E5966;
       padding: 5px 10px;
       font-size: 12px;
-      line-height: 1.5;
-      height: 30px;
+      line-height: 1;
       cursor: pointer;
-      &:hover { background-color: #e7ecf1 }
+      &._active { background-color: #e7ecf1 }
       ._light { font-size: 12px; font-weight: 300 }
     }
   }
@@ -70,15 +77,62 @@
 
   export default {
     name: 'address-field',
+    props: ['type'],
     data() {
       return {
-        city: { name: 'Ярославль' },
-        autocomplete: {}
+        label: '',
+        fieldValue: '',
+        selectedObject: {},
+        searchResults: {},
+        selectedItem: -1
       }
     },
     methods: {
-      getCityByName(name, type) {
-        let typeCode = type;
+      onArrowSelect(event) {
+        if ( event.keyCode === 38 && this.selectedItem > 0 ) {
+          this.selectedItem -= 1;
+        }
+        else if ( event.keyCode === 38 && this.selectedItem === 0 ) {
+          this.selectedItem = -1;
+          this.$refs.addressField.focus();
+        }
+        else if ( event.keyCode === 40 && this.selectedItem < this.searchResults.length - 1 ) {
+          this.selectedItem += 1;
+        }
+        else if ( event.keyCode === 27 ) {
+          this.selectedItem = -1;
+          this.$refs.addressField.focus();
+        }
+        else if ( event.keyCode === 13 && this.selectedItem !== -1 ) {
+          console.log(event)
+          this.selectedObject = this.searchResults[this.selectedItem];
+          this.fieldValue = this.selectedObject.name;
+        }
+        return false;
+      },
+      onTyping(event) {
+        if ( event.keyCode === 40 ) {
+          this.$refs.autocompleteMenu.focus();
+          this.selectedItem = 0;
+        }
+        if ( event.keyCode === 38 ) {
+          this.$refs.autocompleteMenu.focus();
+          this.selectedItem = this.searchResults.length - 1;
+        }
+        if ( this.type === 'city' && this.fieldValue.length > 2 ) {
+          this.getCityByName(this.fieldValue).then( (response) => {
+            this.searchResults = response.body.result;
+          });
+        }
+        return false;
+      },
+
+      getCityByName(name, type, page) {
+        let limit = 5,
+            pageNum = page,
+            typeCode = type;
+
+        ( typeof pageNum === 'undefined' ) && ( pageNum = 0 );
         ( typeof typeCode === 'undefined' ) && ( typeCode = 7 );
 
         return this.$http.jsonp(apiUrl, {
@@ -86,27 +140,18 @@
             contentType: 'city',
             typeCode: typeCode,
             withParent: 1,
-            query: name
+            query: name,
+            limit: limit,
+            offset: pageNum * limit
           }
         });
-      },
-      cityAutocomplete() {
-        this.getCityByName(this.city.name).then( (response) => {
-          let result = response.body.result;
-          if ( result.length !== 0 ) {
-            console.log(result)
-            this.autocomplete = result;
-          }
-        })
       }
     },
     created() {
-      this.getCityByName('Ярославль', 1).then( (response) => {
-        let result = response.body.result;
-        if ( result.length !== 0 ) {
-          this.city = result[0];
-        }
-      })
+      if ( this.type === 'city' ) {
+        this.fieldValue = 'Ярославль';
+        this.label = 'Город';
+      }
     }
   }
 </script>

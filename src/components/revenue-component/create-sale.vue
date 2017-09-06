@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.create_sale">
-    <sale-address-field />
+    <sale-address-field type="city" />
   </div>
 </template>
 
