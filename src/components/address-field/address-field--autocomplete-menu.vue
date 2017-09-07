@@ -1,13 +1,15 @@
 <template>
   <ul :class="$style.autocomplete_menu" tabindex="0"
     @keyup="onKeyUp"
-    @focus="onFocus">
+    @focus="onFocus"
+    @blur="onBlur">
+    <li :class="$style.not_found" v-if="notFound">Ничего не найдено</li>
     <autocomplete-menu-item v-for="( item, index ) in results"
       :contentType="contentType"
       :item="item"
       :key="item.id"
       :isActive="focusedItem === index"
-      @onSelect="selectItem"
+      @select="onSelect"
     />
   </ul>
 </template>
@@ -20,6 +22,13 @@
     background-color: #fff;
     margin-top: -1px;
     width: 280px;
+    .not_found {
+      padding: 5px 10px;
+      color: #4E5966;
+      font-size: 12px;
+      font-weight: 300;
+      cursor: pointer;
+    }
   }
 </style>
 
@@ -30,7 +39,7 @@
   Vue.use(VueResource);
 
   const apiUrl = 'https://kladr-api.ru/api.php',
-        resultsLimit = 10
+        limit = 10
   import AutocompleteMenuItem from './autocomplete-menu--item.vue';
 
   export default {
@@ -39,7 +48,6 @@
     props: ['query', 'contentType', 'parentId'],
     data() {
       return {
-        object: {},
         results: {},
         focusedItem: ''
       }
@@ -47,34 +55,37 @@
     watch: {
       query(value) {
         
-        if ( value !== '' ) {
-          this.$emit('loadingStateChange', false);
-            
-          if ( this.contentType === 'city' ) {
-            this.getCityByName(value).then( (response) => {
-              this.results = response.body.result;
-              this.$emit('loadingStateChange', true);
-            });
+        this.$emit('loadingStateChange', false);
+        this.queryDelay( ()=> {
+
+          let params = {
+            contentType: this.contentType,
+            query: this.query, 
+            limit,
+            withParent: 1
           }
 
-          if ( this.contentType === 'street' && typeof this.parentId !== 'undefined' ) {
-            this.getStreetByCityId(value, this.parentId ).then( (response) => {
-              this.results = response.body.result;
-              this.$emit('loadingStateChange', true);
-            });
+          switch(this.contentType) {
+            case 'city': params.typeCode = 7; break;
+            case 'street': params.cityId = this.parentId; break;
+            case 'building': params.streetId = this.parentId; break
           }
 
-          if ( this.contentType === 'building' && typeof this.parentId !== 'undefined' ) {
-            this.getBuildingByStreetId(value, this.parentId ).then( (response) => {
-              this.results = response.body.result;
-              this.$emit('loadingStateChange', true);
-            });
-          }
-        }
+          this.$http.jsonp(apiUrl, { params }).then( (response)=> {
+            this.results = response.body.result;
+            this.$emit('loadingStateChange', true);
+          })
+        })
+      }
+    },
+    computed: {
+      notFound() {
+        return this.results.length === 0;
       }
     },
     methods: {
-      selectItem(object) {
+      onSelect(object) {
+        this.focusedItem = '';
         this.$emit('select', object);
       },
       queryDelay: (function() {
@@ -85,9 +96,9 @@
         }
       })(),
 
-      onFocus() {
-        this.focusedItem = 0;
-      },
+      onFocus() { this.focusedItem = 0 },
+      
+      onBlur() { this.focusedItem = '' },
 
       onKeyUp(event) {
         let resultsCount = this.results.length - 1;
@@ -98,45 +109,11 @@
             this.focusedItem += 1;
         }
         if ( event.keyCode === 13 ) {
-            this.selectItem(this.results[this.focusedItem]);
+          this.onSelect(this.results[this.focusedItem]);
         }
         if ( event.keyCode === 27 ) {
           this.$emit('focusStateChange', false);
         }
-      },
-
-      getCityByName(name) {
-        return this.$http.jsonp(apiUrl, {
-          params: {
-            contentType: 'city',
-            typeCode: 7,
-            withParent: 1,
-            query: name,
-            limit: resultsLimit
-          }
-        });
-      },
-      getStreetByCityId(name, cityId) {
-        return this.$http.jsonp(apiUrl, {
-          params: {
-            contentType: 'street',
-            withParent: 1,
-            query: name,
-            cityId: cityId,
-            limit: resultsLimit
-          }
-        });
-      },
-      getBuildingByStreetId(name, streetId) {
-        return this.$http.jsonp(apiUrl, {
-          params: {
-            contentType: 'building',
-            withParent: 1,
-            query: name,
-            streetId: streetId,
-            limit: resultsLimit
-          }
-        });
       }
     }
   }

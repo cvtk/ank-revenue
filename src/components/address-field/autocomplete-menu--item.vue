@@ -1,5 +1,5 @@
 <template>
-    <li :class="[ $style.item, isActive && $style._active ]" @click="selectItem">
+    <li :class="[ $style.item, isActive && $style._active ]" @click="onSelect">
       {{ item.typeShort }}. {{ item.name }}
       <span v-if="contentType === 'city'" :class="$style._lighten" v-for="parent in item.parents">
         {{ parent.name }} {{ parent.typeShort }}
@@ -25,7 +25,8 @@
     &:hover, &._active { background-color: #e7ecf1 }
     ._lighten { &:before { content: "―" }
       font-size: 12px;
-      font-weight: 300 }
+      font-weight: 300;
+    }
   }
 </style>
 
@@ -35,8 +36,8 @@
     name: 'autocomplete-menu',
     props: ['contentType', 'item', 'isActive'],
     methods: {
-      selectItem() {
-        this.$emit('onSelect', this.item);
+      onSelect() {
+        this.$emit('select', this.item);
       }
     }
   }

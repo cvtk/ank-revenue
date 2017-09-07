@@ -1,11 +1,11 @@
 <template>
   <div :class="$style.address_field">
-    <input type="text" ref="addressFieldInput"
+    <input type="text" ref="addressFieldInput" v-model="fieldValue"
       :class="[ $style.address_field__input, isFilledOut && $style._fulfilled ]"
-      :placeholder="placeholder" 
-      :value="fieldValue"
-      @change="onChange"
+      :placeholder="placeholder"
+      :disabled="disabled" 
       @keyup="onKeyUp"
+      @blur="onBlur"
     />
     <img :class="$style.address_field__loader" src="../../assets/icons/spin.svg" v-if="!dataReady">
     <div :class="$style.address_field__autocomplete_menu" v-show="showMenu === true">
@@ -69,13 +69,10 @@
         showMenu: false
       }
     },
-    watch: {
-      fieldValue(value) {
-        console.log(value);
-        this.queryDelay( () => { this.query = value } );
-      }
-    },
     computed: {
+      disabled() {
+        return this.contentType !== 'city' && typeof this.parentId === 'undefined';
+      },
       isFilledOut() {
         if ( this.fieldValue === this.object.name ) {
           this.$emit('input', this.object);
@@ -89,16 +86,16 @@
       }
     },
     methods: {
-      onChange(event) {
-        let value = event.target.value;
-        this.fieldValue = value;
+      onBlur() {
       },
       onKeyUp(event) {
         if ( event.keyCode === 40 || event.keyCode === 38 ) {
           this.$refs.autocompleteMenu.$el.focus();
         }
+        this.query = this.fieldValue;
       },
       onFocusStateChange(state) {
+        this.showMenu = false;
         this.$refs.addressFieldInput.focus();
       },
       onLoadingStateChange(state) {
