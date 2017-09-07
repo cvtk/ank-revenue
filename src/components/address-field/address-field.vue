@@ -1,16 +1,21 @@
 <template>
   <div :class="$style.address_field">
-    <input type="text" :class="[ $style.address_field__input, isFilledOut && $style._fulfilled ]"
-      :placeholder="label" 
+    <input type="text" ref="addressFieldInput"
+      :class="[ $style.address_field__input, isFilledOut && $style._fulfilled ]"
+      :placeholder="placeholder" 
       :value="fieldValue"
+      @change="onChange"
       @keyup="onKeyUp"
     />
     <img :class="$style.address_field__loader" src="../../assets/icons/spin.svg" v-if="!dataReady">
-    <div :class="$style.address_field__autocomplete_menu">
-      <autocomplete-menu contentType="city" ref="autocompleteMenu"
+    <div :class="$style.address_field__autocomplete_menu" v-show="showMenu === true">
+      <autocomplete-menu ref="autocompleteMenu"
         @select = "onObjectSelect"
         @loadingStateChange = "onLoadingStateChange"
+        @focusStateChange = "onFocusStateChange"
         :query="query"
+        :parentId="parentId"
+        :contentType="contentType"
       />
     </div>
   </div>
@@ -33,7 +38,6 @@
       transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
       color: #555;
       &._fulfilled { border-color: #32c5d2 }
-      &:focus { border-color: #4E5966 }
       &:last-child { margin-right: 0 }
     }
     .address_field__loader {
@@ -55,39 +59,64 @@
   export default {
     name: 'address-field',
     components: { AutocompleteMenu },
-    props: ['type'],
+    props: ['contentType', 'placeholder', 'value', 'parentId' ],
     data() {
       return {
-        label: '',
         fieldValue: '',
         query: '',
         object: {},
-        dataReady: true
+        dataReady: true,
+        showMenu: false
+      }
+    },
+    watch: {
+      fieldValue(value) {
+        console.log(value);
+        this.queryDelay( () => { this.query = value } );
       }
     },
     computed: {
       isFilledOut() {
-        return this.fieldValue === this.object.name;
+        if ( this.fieldValue === this.object.name ) {
+          this.$emit('input', this.object);
+          return true;
+        }
+      }
+    },
+    created() {
+      if ( typeof this.value !== 'undefined' ) {
+        this.fieldValue = this.value;
       }
     },
     methods: {
+      onChange(event) {
+        let value = event.target.value;
+        this.fieldValue = value;
+      },
       onKeyUp(event) {
         if ( event.keyCode === 40 || event.keyCode === 38 ) {
           this.$refs.autocompleteMenu.$el.focus();
         }
-        let value = event.target.value;
-        this.fieldValue = value;
-        this.query = value;
+      },
+      onFocusStateChange(state) {
+        this.$refs.addressFieldInput.focus();
       },
       onLoadingStateChange(state) {
-        if ( state ) this.dataReady = true
+        if ( state ) { this.dataReady = true; this.showMenu = true }
         else this.dataReady = false;
       },
       onObjectSelect(object) {
-        this.query = '';
+        this.showMenu = false;
         this.object = object;
         this.fieldValue = object.name;
-      }
+      },
+      queryDelay: (function() {
+        let timer = 0;
+        return function(callback) {
+          clearTimeout(timer);
+          timer = setTimeout(callback, 750);
+        }
+      })(),
     }
   }
 </script>

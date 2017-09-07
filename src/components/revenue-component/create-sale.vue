@@ -1,6 +1,16 @@
 <template>
   <div :class="$style.create_sale">
-    <sale-address-field type="city" />
+
+    <addr-field contentType="city" placeholder="Город" v-model="address.city" />
+    <addr-field contentType="street" placeholder="Улица" v-model="address.street"
+      :parentId="address.city.id"
+      :enabled="address.city.id" 
+    />
+    <addr-field contentType="building" placeholder="Дом" v-model="address.building"
+      :parentId="address.street.id"
+      :enabled="address.street.id"
+    />
+
   </div>
 </template>
 
@@ -23,15 +33,16 @@
 
 <script>
   import firebase from '../../firebase.js';
-  import SaleAddressField from './create-sale--address-field.vue';
+  import AddrField from '../address-field/address-field.vue';
 
   const streetsRef = firebase.database().ref('streets');
 
   export default {
     name: 'create-sale',
-    components: { SaleAddressField },
+    components: { AddrField },
     data() {
       return {
+        address: { city: 'Ярославль', street: '', building: '' },
         newSale: {
           created: '',
           address: '',
