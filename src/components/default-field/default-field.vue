@@ -4,6 +4,9 @@
     <label :for="$style.id" :class="[ $style.default_field__label, fieldIsUsed && $style._overhead ]">
       {{ label }}
     </label>
+    <div v-if="type === 'custom'" :class="$style.default_field__input_custom">
+      <slot></slot>
+    </div>
     <input v-if="type === 'number'" type="number" v-model="fieldValue"
       :class="$style.default_field__input"
       :id="$style.id"
@@ -20,6 +23,8 @@
       @focus="fieldFocused = true"
       @blur="fieldFocused = false"
     />
+    
+    </div>
   </div>
 </template>
 
@@ -67,6 +72,22 @@
       color: #555;
     }
     
+    .default_field__input_custom {
+      display: inline-block;
+      position: relative;
+      z-index: 2;
+      outline: none;
+      width: 100%;
+      height: 30px;
+      padding: 5px 0 5px 10px;
+      font-size: 13px;
+      line-height: 30px;
+      background-color: #fff;
+      border: 1px solid #ee6052;
+      transition: border-color .25s;
+      color: #555;
+    }
+
     .default_field__label {
       position: absolute;
       z-index: 3;

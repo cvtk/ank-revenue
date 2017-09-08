@@ -16,7 +16,6 @@
       <div :class="$style.address_input__building_field">
         <addr-field contentType="building" placeholder="Дом" v-model="address.building"
           :parentId="address.street.id"
-          
         />
       </div>
       <div :class="$style.address_input__room_field">
@@ -52,11 +51,15 @@
         <input :class="$style.default_field" />
       </div>
       <div :class="$style.deal_properties__sale_date">
-        <datepicker :input-class="$style.default_field"
-          placeholder="Дата продажи"
-          language="ru" 
-          v-model="newSale.created"
-        />
+        <default-field type="custom"
+          :isDone="address.room"
+          :needAttention="true">
+          <datepicker :input-class="$style.default_field"
+            placeholder="Дата продажи"
+            language="ru" 
+            v-model="newSale.created"
+          />
+        </default-field>
       </div>
 
     </div>
