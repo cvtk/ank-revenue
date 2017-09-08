@@ -26,9 +26,11 @@
     display: inline-block;
     position: relative;
     font-size: 0;
+    width: 100%;
     .address_field__input {
       display: inline-block;
       outline: none;
+      width: 100%;
       height: 30px;
       padding: 5px 10px;
       font-size: 12px;
@@ -56,6 +58,24 @@
   import Vue from 'vue';
   import AutocompleteMenu from './address-field--autocomplete-menu.vue';
 
+  const defaultCity = {
+    contentType: 'city',
+    id: '7600000100000',
+    name: 'Ярославль',
+    okato: '78401000000',
+    parents: [{
+      contentType: 'region',
+      id: '7600000000000',
+      name: 'Ярославская',
+      okato: '78000000000',
+      type: 'Область',
+      typeShort: 'обл',
+      zip: 150029
+    }],
+    type: 'Город',
+    typeShort: 'г',
+    zip: 150029
+  }
   export default {
     name: 'address-field',
     components: { AutocompleteMenu },
@@ -81,8 +101,9 @@
       }
     },
     created() {
-      if ( typeof this.value !== 'undefined' ) {
+      if ( typeof this.value !== 'undefined' && this.contentType === 'city' ) {
         this.fieldValue = this.value;
+        this.object = defaultCity;
       }
     },
     methods: {
