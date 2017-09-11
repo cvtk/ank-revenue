@@ -42,14 +42,7 @@
           </tr>
         </thead>
         <tbody :class="$style.items_list__content">
-          <tr :class="$style.items_list__row" v-for="sale in sales">
-            <td :class="$style.items_list__column">{{ sale.created }}</td>
-            <td :class="$style.items_list__column">{{ sale.address.city.name }}, {{ sale.address.street.name }}</td>
-            <td :class="$style.items_list__column">{{ sale.price }}</td>
-            <td :class="$style.items_list__column">{{ sale.commission }}</td>
-            <td :class="$style.items_list__column">{{ sale.partner }}</td>
-            <td :class="$style.items_list__column">{{ sale.employee }}</td>
-          </tr>
+          <sales-row v-for="sale in sales" :sale="sale" :key="sale.key" />
         </tbody>
       </table>
     </div>
@@ -211,12 +204,13 @@
   import firebase from '../firebase.js';
   import hlp from '../helpers/helpers.js';
   import CreateSale from './revenue-component/create-sale.vue';
+  import SalesRow from './revenue-component/sales-row.vue';
 
   const revenueRef = firebase.database().ref('revenue');
 
   export default {
     name: 'revenue',
-    components: { CreateSale },
+    components: { CreateSale, SalesRow },
     data() {
       return {
         sales: {},
