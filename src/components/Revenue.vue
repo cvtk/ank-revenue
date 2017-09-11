@@ -10,10 +10,10 @@
         </div>
         <div :class="$style.tool_bar__table_period">
           <div :class="$style.table_period">
-            <span :class="$style.table_period__button">Квартал</span>
-            <span :class="$style.table_period__button">Месяц</span>
-            <span :class="$style.table_period__button" @click="setPeriod().week()">Неделя</span>
-            <span :class="[ $style.table_period__button, $style._active ]" @click="setPeriod().day()">Сегодня</span>
+            <span :class="[ $style.table_period__button, dateRange === 'quarter' && $style._active ]" @click="dateRange = 'quarter'">Квартал</span>
+            <span :class="[ $style.table_period__button, dateRange === 'month' && $style._active ]" @click="dateRange = 'month'">Месяц</span>
+            <span :class="[ $style.table_period__button, dateRange === 'week' && $style._active ]" @click="dateRange = 'week'">Неделя</span>
+            <span :class="[ $style.table_period__button, dateRange === 'today' && $style._active ]" @click="dateRange = 'today'">Сегодня</span>
           </div>
         </div>
       </div>
@@ -220,44 +220,45 @@
     data() {
       return {
         sales: {},
-        endAt: '',
-        startAt: '',
+        dateRange: 'week',
         showSaleCreateForm: false
       }
     },
-    created() {
-      let defaultDateToday = new Date(),
-          startAt = defaultDateToday.setHours(0, 0, 0, 0),
-          endAt = defaultDateToday.setHours(24, 0, 0, 0);
-
-      this.startAt = hlp._dateToUnix(startAt);
-      this.endAt = hlp._dateToUnix(endAt);
-
-      revenueRef.orderByChild('created').startAt(this.startAt).endAt(this.endAt).on('value', sales => {
-        sales.forEach(sale => {
-          this.$set( this.sales, sale.key, sale.val() );
-        });
-      })
+    watch: {
+      dateRange(period) {
+        this.onDateRangeChange();
+      }
     },
+
+    mounted() {
+      this.onDateRangeChange();
+    },
+
     methods: {
-      setPeriod() {
-        let dateObject = new Date(),
-            endDate = dateObject.setHours(24, 0, 0, 0),
-            startDate = '';
+      endAt() {
+        let dateObject = new Date();
+        return hlp._dateToUnix(dateObject.setHours(24, 0, 0, 0));
+      },
 
-        this.endAt = hlp._dateToUnix(endDate);
+      startAt() {
+        let dateObject = new Date(), startAt = '';
 
-        return {
-          day() {
-            console.log(this.startAt);
-            startDate = dateObject.setHours(0, 0, 0, 0),
-            this.startAt = hlp._dateToUnix(startDate);
-          },
-          week() {
-            startDate = new Date(dateObject.getFullYear(), dateObject.getMonth(), dateObject.getDate() - 7);
-            this.startAt = hlp._dateToUnix(startDate);
-          },
+        switch ( this.dateRange ) {
+          case 'week': startAt = new Date(dateObject.getFullYear(), dateObject.getMonth(), dateObject.getDate() - 7); break;
+          case 'month': startAt = new Date(dateObject.getFullYear(), dateObject.getMonth() - 1, 1); break;
+          case 'quarter': startAt = new Date(dateObject.getFullYear(), dateObject.getMonth() - 3, 1); break;
+          default: startAt = dateObject.setHours(0, 0, 0, 0); break;
         }
+        return hlp._dateToUnix(startAt);
+      },
+
+      onDateRangeChange() {
+        let ref = revenueRef.orderByChild('created').startAt(this.startAt()).endAt(this.endAt());
+        ref.off( 'value', this.firebaseValueCallback );
+        ref.on( 'value', this.firebaseValueCallback );
+      },
+      firebaseValueCallback(sales) {
+        this.sales = sales.val();
       }
     }
   }
