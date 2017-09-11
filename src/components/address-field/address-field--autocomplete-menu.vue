@@ -1,7 +1,5 @@
 <template>
-  <ul :class="$style.autocomplete_menu" tabindex="0"
-    @keyup="onKeyUp"
-    @focus="onFocus"
+  <ul :class="$style.autocomplete_menu"
     @blur="onBlur">
     <li :class="$style.not_found" v-if="notFound">Ничего не найдено</li>
     <autocomplete-menu-item v-for="( item, index ) in results"
@@ -20,8 +18,7 @@
     outline: none;
     border: 1px solid #c2cad8;
     background-color: #fff;
-    margin-top: -1px;
-    width: 280px;
+    width: 100%;
     .not_found {
       padding: 5px 10px;
       color: #4E5966;
@@ -45,37 +42,39 @@
   export default {
     name: 'autocomplete-menu',
     components: { AutocompleteMenuItem },
-    props: ['query', 'contentType', 'parentId'],
+    props: ['query', 'contentType', 'parentId', 'isDone'],
     data() {
       return {
         results: {},
-        focusedItem: ''
+        focusedItem: 0
       }
     },
     watch: {
       query(value) {
-        
-        this.$emit('loadingStateChange', false);
-        this.queryDelay( ()=> {
+        if ( !this.isDone ) {
+          this.focusedItem = 0;
+          this.$emit('loadingStateChange', false);
+          this.queryDelay( ()=> {
 
-          let params = {
-            contentType: this.contentType,
-            query: this.query, 
-            limit,
-            withParent: 1
-          }
+            let params = {
+              contentType: this.contentType,
+              query: this.query, 
+              limit,
+              withParent: 1
+            }
 
-          switch(this.contentType) {
-            case 'city': params.typeCode = 7; break;
-            case 'street': params.cityId = this.parentId; break;
-            case 'building': params.streetId = this.parentId; break
-          }
+            switch(this.contentType) {
+              case 'city': params.typeCode = 7; break;
+              case 'street': params.cityId = this.parentId; break;
+              case 'building': params.streetId = this.parentId; break
+            }
 
-          this.$http.jsonp(apiUrl, { params }).then( (response)=> {
-            this.results = response.body.result;
-            this.$emit('loadingStateChange', true);
+            this.$http.jsonp(apiUrl, { params }).then( (response)=> {
+              this.results = response.body.result;
+              this.$emit('loadingStateChange', true);
+            })
           })
-        })
+        }
       }
     },
     computed: {
@@ -85,7 +84,7 @@
     },
     methods: {
       onSelect(object) {
-        this.focusedItem = '';
+        this.focusedItem = 0;
         this.$emit('select', object);
       },
       queryDelay: (function() {
@@ -95,24 +94,19 @@
           timer = setTimeout(callback, 750);
         }
       })(),
-
-      onFocus() { this.focusedItem = 0 },
       
-      onBlur() { this.focusedItem = '' },
+      onBlur() { this.focusedItem = 0 },
 
-      onKeyUp(event) {
+      onKeyup(key) {
         let resultsCount = this.results.length - 1;
-        if ( event.keyCode === 38 && this.focusedItem > 0 ) {
+        if ( key === 'up' && this.focusedItem > 0 ) {
             this.focusedItem -= 1;
         }
-        if ( event.keyCode === 40 && this.focusedItem < resultsCount ) {
+        if ( key === 'down' && this.focusedItem < resultsCount ) {
             this.focusedItem += 1;
         }
-        if ( event.keyCode === 13 ) {
+        if ( key === 'enter' ) {
           this.onSelect(this.results[this.focusedItem]);
-        }
-        if ( event.keyCode === 27 ) {
-          this.$emit('focusStateChange', false);
         }
       }
     }

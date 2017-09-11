@@ -1,27 +1,29 @@
 <template>
   <div :class="[ $style.default_field, isDone && $style._done ]">
     <div :class="$style.default_field__pulse" v-if="needAttention && !fieldFocused && !isDone"></div>
-    <label :for="$style.id" :class="[ $style.default_field__label, fieldIsUsed && $style._overhead ]">
+    <label :for="id" 
+      :class="[ $style.default_field__label, (fieldIsUsed || type === 'custom') && $style._overhead ]">
       {{ label }}
     </label>
-    <div v-if="type === 'custom'" :class="$style.default_field__input_custom">
+    <div v-if="type === 'custom'" :id="id" 
+      :class="$style.default_field__input">
       <slot></slot>
     </div>
-    <input v-if="type === 'number'" type="number" v-model="fieldValue"
+    <input v-if="type === 'number'" type="number" :value="value"
       :class="$style.default_field__input"
-      :id="$style.id"
+      :id="id"
       :min="min"
       :max="max"
-      @keyup="keyUp"
+      @input="onInput"
       @focus="fieldFocused = true"
-      @blur="fieldFocused = false"
+      @blur="onBlur"
     />
-    <input v-else type="text" v-model="fieldValue"
+    <input v-if="type === 'text'" type="text" :value="value"
       :class="$style.default_field__input"
-      :id="$style.id"
-      @keyup="keyUp"
+      :id="id"
+      @input="onInput"
       @focus="fieldFocused = true"
-      @blur="fieldFocused = false"
+      @blur="onBlur"
     />
     
     </div>
@@ -29,11 +31,18 @@
 </template>
 
 <style lang="scss" module>
-  .id { /* */ }
 
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
   .default_field {
     position: relative;
-    padding: 12px 10px 5px;
+    padding-top: 12px;
     &._done {
       .default_field__input { border-color: #32c5d2 }
       .default_field__label { color: #777 !important }
@@ -44,9 +53,9 @@
       z-index: 1;
       border: 3px solid #ee6052;
       height: 30px;
-      left: 10px;
+      left: 0;
       top: 12px;
-      right: 10px;
+      right: 0;
       -webkit-animation: pulsate .55s ease-out;
       -webkit-animation-iteration-count: infinite; 
       opacity: 0;
@@ -71,37 +80,21 @@
       transition: border-color .25s;
       color: #555;
     }
-    
-    .default_field__input_custom {
-      display: inline-block;
-      position: relative;
-      z-index: 2;
-      outline: none;
-      width: 100%;
-      height: 30px;
-      padding: 5px 0 5px 10px;
-      font-size: 13px;
-      line-height: 30px;
-      background-color: #fff;
-      border: 1px solid #ee6052;
-      transition: border-color .25s;
-      color: #555;
-    }
 
     .default_field__label {
       position: absolute;
       z-index: 3;
       top: 19px;
-      left: 20px;
+      left: 10px;
       cursor: text;
       font-family: "Arial", sans-serif;
       color: #777;
       font-size: 12px;
-      transition: font-size .35s, top .35s, left .35s, color .35s;
+      transition: font-size .15s, top .15s, left .15s, color .15s;
       &._overhead {
         font-size: 11px;
         top: -2px;
-        left: 10px;
+        left: 0;
         color: #ee6052;
       }
     }
@@ -115,28 +108,18 @@
     props: ['label', 'value', 'isDone', 'type', 'min', 'max', 'needAttention' ],
     data() {
       return {
-        fieldValue: this.value,
-        fieldFocused: false
+        fieldFocused: false,
+        id: Math.random().toString(36).substring(7)
       }
     },
     computed: {
       fieldIsUsed() {
-        return this.fieldFocused || this.fieldValue !== '';
+        return this.fieldFocused || this.value !== '';
       },
     },
     methods: {
-      keyUp() {
-        this.delay( ()=> {
-          this.$emit('input', this.fieldValue)
-        })
-      },
-      delay: (function() {
-        let timer = 0;
-        return function(callback) {
-          clearTimeout(timer);
-          timer = setTimeout(callback, 550);
-        }
-      })(),
+      onBlur(event) { this.fieldFocused = false; this.$emit('blur') },
+      onInput(event) { this.$emit('input', event.target.value ) }
     }
   }
 </script>

@@ -1,10 +1,12 @@
 <template>
   <div :class="$style.address_field">
-    <input type="text" ref="addressFieldInput" v-model="fieldValue"
-      :class="[ $style.address_field__input, isFilledOut && $style._fulfilled ]"
-      :placeholder="placeholder"
-      :disabled="disabled" 
-      @keyup="onKeyUp"
+    <default-field :value="value" type="text"
+      ref="addressFieldInput"
+      :label="label"
+      :isDone="isDone"
+      :needAttention="false"
+      @input.native="onInput"
+      @keyup.native="onKeyup"
       @blur="onBlur"
     />
     <img :class="$style.address_field__loader" src="../../assets/icons/spin.svg" v-if="!dataReady">
@@ -12,8 +14,8 @@
       <autocomplete-menu ref="autocompleteMenu"
         @select = "onObjectSelect"
         @loadingStateChange = "onLoadingStateChange"
-        @focusStateChange = "onFocusStateChange"
-        :query="query"
+        :isDone="isDone"
+        :query="value"
         :parentId="parentId"
         :contentType="contentType"
       />
@@ -27,114 +29,75 @@
     position: relative;
     font-size: 0;
     width: 100%;
-    .address_field__input {
-      display: inline-block;
-      outline: none;
-      width: 100%;
-      height: 30px;
-      padding: 5px 10px;
-      font-size: 12px;
-      line-height: 1.5;
-      background-color: #fff;
-      border: 1px solid #ee6052;
-      transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-      color: #555;
-      &._fulfilled { border-color: #32c5d2 }
-      &:last-child { margin-right: 0 }
     }
-    .address_field__loader {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 30px;
-      height: 30px;
-    }
-    .address_field__autocomplete_menu { position: absolute; outline: none }
+  .address_field__loader {
+    position: absolute;
+    top: 14px;
+    right: 2px;
+    width: 26px;
+    height: 26px;
+    z-index: 5;
   }
+  .address_field__autocomplete_menu {
+    position: absolute;
+    outline: none;
+    z-index: 5;
+    width: 100%;
+  }
+
 
 </style>
 
 <script>
   import Vue from 'vue';
+  import DefaultField from '../default-field/default-field.vue';
   import AutocompleteMenu from './address-field--autocomplete-menu.vue';
 
-  const defaultCity = {
-    contentType: 'city',
-    id: '7600000100000',
-    name: 'Ярославль',
-    okato: '78401000000',
-    parents: [{
-      contentType: 'region',
-      id: '7600000000000',
-      name: 'Ярославская',
-      okato: '78000000000',
-      type: 'Область',
-      typeShort: 'обл',
-      zip: 150029
-    }],
-    type: 'Город',
-    typeShort: 'г',
-    zip: 150029
-  }
   export default {
     name: 'address-field',
-    components: { AutocompleteMenu },
-    props: ['contentType', 'placeholder', 'value', 'parentId' ],
+    components: { AutocompleteMenu, DefaultField },
+    props: ['contentType', 'label', 'value', 'parentId', 'isDone' ],
     data() {
       return {
-        fieldValue: '',
         query: '',
-        object: {},
         dataReady: true,
         showMenu: false
       }
     },
-    computed: {
-      disabled() {
-        return this.contentType !== 'city' && typeof this.parentId === 'undefined';
-      },
-      isFilledOut() {
-        if ( this.fieldValue === this.object.name ) {
-          this.$emit('input', this.object);
-          return true;
-        }
-      }
-    },
-    created() {
-      if ( typeof this.value !== 'undefined' && this.contentType === 'city' ) {
-        this.fieldValue = this.value;
-        this.object = defaultCity;
-      }
-    },
     methods: {
-      onBlur() {
-      },
-      onKeyUp(event) {
-        if ( event.keyCode === 40 || event.keyCode === 38 ) {
-          this.$refs.autocompleteMenu.$el.focus();
+      onKeyup(event) {
+        if ( event.keyCode === 40 ) {
+          this.$refs.autocompleteMenu.onKeyup('down');
         }
-        this.query = this.fieldValue;
+        else if ( event.keyCode === 38 ) {
+          this.$refs.autocompleteMenu.onKeyup('up');
+        }
+        else if ( event.keyCode === 13 ) {
+          this.$refs.autocompleteMenu.onKeyup('enter');
+        }
+        else if ( event.keyCode === 27 ) { this.onBlur() }
       },
-      onFocusStateChange(state) {
-        this.showMenu = false;
-        this.$refs.addressFieldInput.focus();
-      },
+
+      onInput(event) { this.$emit('input', event.target.value) },
+
+      onBlur() { setTimeout(function() { this.showMenu = false }, 150) },
+
       onLoadingStateChange(state) {
         if ( state ) { this.dataReady = true; this.showMenu = true }
         else this.dataReady = false;
       },
+
       onObjectSelect(object) {
         this.showMenu = false;
-        this.object = object;
-        this.fieldValue = object.name;
+        this.$emit('objectSelect', object);
       },
-      queryDelay: (function() {
+      delay: (function() {
         let timer = 0;
         return function(callback) {
           clearTimeout(timer);
-          timer = setTimeout(callback, 750);
+          timer = setTimeout(callback, 150);
         }
-      })(),
+      })()
     }
   }
 </script>
