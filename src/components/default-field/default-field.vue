@@ -63,7 +63,7 @@
     @-webkit-keyframes pulsate {
       0% { opacity: 0 }
       50% { opacity: .5 }
-      100% { -webkit-transform: scale(1.1, 1.4); opacity: 0;}
+      100% { -webkit-transform: scale(1.05, 1.4); opacity: 0;}
     }
     .default_field__input {
       display: inline-block;

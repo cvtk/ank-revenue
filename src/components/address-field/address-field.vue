@@ -4,7 +4,7 @@
       ref="addressFieldInput"
       :label="label"
       :isDone="isDone"
-      :needAttention="false"
+      :needAttention="needAttention"
       @input.native="onInput"
       @keyup.native="onKeyup"
       @blur="onBlur"
@@ -36,12 +36,12 @@
     right: 2px;
     width: 26px;
     height: 26px;
-    z-index: 5;
+    z-index: 6;
   }
   .address_field__autocomplete_menu {
     position: absolute;
     outline: none;
-    z-index: 5;
+    z-index: 6;
     width: 100%;
   }
 
@@ -56,7 +56,7 @@
   export default {
     name: 'address-field',
     components: { AutocompleteMenu, DefaultField },
-    props: ['contentType', 'label', 'value', 'parentId', 'isDone' ],
+    props: ['contentType', 'label', 'value', 'parentId', 'isDone', 'needAttention' ],
     data() {
       return {
         query: '',
@@ -80,7 +80,7 @@
 
       onInput(event) { this.$emit('input', event.target.value) },
 
-      onBlur() { setTimeout(function() { this.showMenu = false }, 150) },
+      onBlur() { setTimeout(()=> { this.showMenu = false }, 150) },
 
       onLoadingStateChange(state) {
         if ( state ) { this.dataReady = true; this.showMenu = true }
@@ -90,14 +90,7 @@
       onObjectSelect(object) {
         this.showMenu = false;
         this.$emit('objectSelect', object);
-      },
-      delay: (function() {
-        let timer = 0;
-        return function(callback) {
-          clearTimeout(timer);
-          timer = setTimeout(callback, 150);
-        }
-      })()
+      }
     }
   }
 </script>

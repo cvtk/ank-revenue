@@ -1,187 +1,224 @@
 <template>
   <div :class="$style.create_sale">
-  <div :class="$style.create_sale__address_input">
-    <div :class="$style.address_input">
-      <div :class="$style.address_input__label_field">
-        <label :class="$style.label_field">Адрес:</label>
-      </div>
-      <div :class="$style.address_input__city_field">
-        <addr-field contentType="city" label="Город" 
-          v-model="city"
-          :isDone="city === address.city.name"
-          @objectSelect="onObjectSelect"
-        />
-      </div>
-      <div :class="$style.address_input__street_field">
-        <addr-field contentType="street" label="Улица"
-          v-model="street"
-          :isDone="street === address.street.name"
-          @objectSelect="onObjectSelect"
-          :parentId="address.city.id"
-        />
-      </div>
-      <div :class="$style.address_input__building_field">
-        <addr-field contentType="building" label="Дом"
-          v-model="building"
-          :isDone="building === address.building.name"
-          @objectSelect="onObjectSelect"
-          :parentId="address.street.id"
-        />
-      </div>
-      <div :class="$style.address_input__room_field">
-        <default-field label="Квартира"
-          v-model="address.room"
-          type="number"
-          min="1"
-          max="999"
-          :isDone="address.room"
-          :needAttention="false"
-        />
-      </div>
-    </div>
-  </div>
-  <div :class="$style.create_sale__deal_properties">
-    <div :class="$style.deal_properties">
-      <div :class="$style.deal_properties__label_field">
-        <label :class="$style.label_field">Сделка:</label>
-      </div>
-      <div :class="$style.deal_properties__sale_price">
-        <default-field label="Цена"
-          v-model="newSale.price"
-          type="number"
-          min="0"
-          :isDone="newSale.price"
-          :needAttention="false"
-        />
-      </div>
-      <div :class="$style.deal_properties__sale_commission">
-        <default-field label="Комиссия"
-          v-model="newSale.commission"
-          type="number"
-          min="0"
-          :isDone="newSale.commission"
-          :needAttention="false"
-        />
-      </div>
-      <div :class="$style.deal_properties__sale_date">
-        <default-field type="custom"
-          label="Дата продажи"
-          :isDone="newSale.created !== ''"
-          :needAttention="true">
-          <datepicker
-            :input-class="$style.sale_date"
-            :calendar-class="$style.sale_date__calendar"
-            language="ru" 
-            v-model="newSale.created"
+    <div :class="$style.create_sale__address_input">
+      <div :class="$style.address_input">
+        <h2 :class="$style.params_header">Адрес объекта</h2>
+        <div :class="$style.address_input__city_field">
+          <addr-field contentType="city" label="Город" 
+            v-model="city"
+            :isDone="city === address.city.name"
+            :needAttention="currentField === 'city'"
+            @objectSelect="onObjectSelect"
           />
-        </default-field>
-      </div>
-      <div :class="$style.deal_properties__communal_included">
-        <div :class="$style.communal_included">
-          <input :class="$style.communal_included__input" v-model="newSale.communal_included" id="dF5BHgkQ" type="checkbox" />
-          <label :class="$style.communal_included__label" for="dF5BHgkQ">
-            <span :class="$style.communal_included__inc"></span>
-            <span :class="$style.communal_included__check"></span>
-            <span :class="$style.communal_included__box"></span>
-            коммунальные включены
-          </label>
+        </div>
+        <div :class="$style.address_input__street_field">
+          <addr-field contentType="street" label="Улица"
+            v-model="street"
+            :isDone="street === address.street.name"
+            :needAttention="currentField === 'street'"
+            @objectSelect="onObjectSelect"
+            :parentId="address.city.id"
+          />
+        </div>
+        <div :class="$style.address_input__building_field">
+          <addr-field contentType="building" label="Дом"
+            v-model="building"
+            :isDone="building === address.building.name"
+            :needAttention="currentField === 'building'"
+            @objectSelect="onObjectSelect"
+            :parentId="address.street.id"
+          />
+        </div>
+        <div :class="$style.address_input__room_field">
+          <default-field label="Квартира"
+            v-model="address.room"
+            type="number"
+            min="1"
+            max="999"
+            :isDone="address.room"
+            :needAttention="currentField === 'room'"
+          />
+        </div>
+        <div :class="$style.address_input__sale_date">
+          <default-field type="custom"
+            label="Дата продажи"
+            :isDone="newSale.created !== ''"
+            :needAttention="currentField === 'created'">
+            <datepicker
+              :input-class="$style.sale_date"
+              :calendar-class="$style.sale_date__calendar"
+              language="ru" 
+              v-model="newSale.created"
+            />
+          </default-field>
         </div>
       </div>
     </div>
-  </div>
-  
-  <div :class="$style.create_sale__deal_participants">
-    <div :class="$style.deal_participants">
-      <div :class="$style.deal_participants__label_field">
-        <label :class="$style.label_field">Адрес:</label>
-      </div>
-
-      <div :class="$style.deal_participants__employee_field">
-        <default-field label="Сотрудник"
-          v-model="newSale.employee"
-          type="text"
-          :isDone="newSale.employee"
-          :needAttention="false"
-        />
-      </div>
-      <div :class="$style.deal_participants__partner_field">
-        <default-field label="Контрагент"
-          v-model="newSale.partner"
-          type="text"
-          :isDone="newSale.partner"
-          :needAttention="false"
-        />
+    <div :class="$style.create_sale__deal_properties">
+      <div :class="$style.deal_properties">
+        <h2 :class="$style.params_header">Параметры сделки</h2>
+        <div :class="$style.deal_properties__employee_field">
+          <default-field label="Сотрудник"
+            v-model="newSale.employee"
+            type="text"
+            :isDone="newSale.employee"
+            :needAttention="currentField === 'employee'"
+          />
+        </div>
+        <div :class="$style.deal_properties__partner_field">
+          <default-field label="Контрагент"
+            v-model="newSale.partner"
+            type="text"
+            :isDone="newSale.partner"
+            :needAttention="currentField === 'partner'"
+          />
+        </div>
+        <div :class="$style.deal_properties__sale_price">
+          <default-field label="Цена"
+            v-model="newSale.price"
+            type="number"
+            min="0"
+            :isDone="newSale.price"
+            :needAttention="currentField === 'price'"
+          />
+        </div>
+        <div :class="$style.deal_properties__sale_commission">
+          <default-field label="Комиссия"
+            v-model="newSale.commission"
+            type="number"
+            min="0"
+            :isDone="newSale.commission"
+            :needAttention="currentField === 'commission'"
+          />
+        </div>
+        <div :class="$style.deal_properties__communal_included">
+          <div :class="$style.communal_included">
+            <input :class="$style.communal_included__input" v-model="newSale.communal_included" id="dF5BHgkQ" type="checkbox" />
+            <label :class="$style.communal_included__label" for="dF5BHgkQ">
+              <span :class="$style.communal_included__inc"></span>
+              <span :class="$style.communal_included__check"></span>
+              <span :class="$style.communal_included__box"></span>
+              коммунальные включены
+            </label>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-    
-
+    <div :class="$style.create_sale__action_buttons">
+      <span :class="[ $style.action_buttons, currentField === 'complete' && $style._active ]" tabindex="0" @click="onClick">Сохранить</span>
+    </div>
   </div>
 </template>
 
 <style lang="scss" module>
   @import "../../assets/styles/mixins.scss";
   .create_sale {
+    &:after { @include clearfix }
     border: 1px solid #c2cad8;
-    .create_sale__address_input { /* */ }
-    .create_sale__other_properties { /* */ }
+    .create_sale__address_input {
+      &:after { @include clearfix }
+      float: left;
+      width: 50%;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    .create_sale__deal_properties {
+      &:after { @include clearfix }
+      float: left;
+      width: 50%;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      border-left: 1px solid #c2cad8;
+    }
+    .create_sale__action_buttons {
+      &:after { @include clearfix }
+      position: relative;
+      clear: both;
+      margin: 15px;
+    }
   }
 
-  .label_field {
-    line-height: 30px;
-    font-weight: 600;
+  .params_header {
+    font-size: 15px;
+    color: #29b4b6;
+    text-transform: uppercase;
+    font-weight: 700;
+    line-height: 18px;
+    margin-top: -15px;
+    margin-bottom: 15px;
   }
 
   .address_input {
     &:after { @include clearfix }
-    padding: 10px;
+    padding: 20px;
 
-    .address_input__label_field {
-      float: left;
-      width: 10%;
-    }
     .address_input__city_field {
       float: left;
-      width: 30%;
-      padding-right: 10px;
+      width: 100%;
+      margin-bottom: 10px;
     }
     .address_input__street_field {
       float: left;
-      width: 30%;
-      padding-right: 10px;
+      width: 100%;
+      margin-bottom: 10px;
     }
     .address_input__building_field {
       float: left;
-      width: 15%;
+      width: 33.333333%;
       padding-right: 10px;
     }
     .address_input__room_field {
       float: left;
-      width: 15%;
+      width: 33.333333%;
+      padding-right: 10px;
+    }
+    .address_input__sale_date {
+      float: left;
+      width: 33.333333%;
+      .sale_date {
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: "Arial", sans-serif;
+        color: #777;
+        padding-bottom: 4px;
+        vertical-align: middle;
+      }
+      .sale_date__calendar {
+        right: -1px;
+        top: 24px;
+        border: 1px solid #c2cad8;
+      }
     }
   }
 
   .deal_properties {
     &:after { @include clearfix }
-    padding: 10px;
-    .deal_properties__label_field {
+    padding: 20px;
+    .deal_properties__employee_field {
       float: left;
-      width: 10%;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .deal_properties__partner_field {
+      float: left;
+      width: 100%;
+      margin-bottom: 10px;
     }
     .deal_properties__sale_price {
       float: left;
-      width: 20%;
-      padding-right: 10px;
+      width: 50%;
+      padding-right: 5px;
     }
     .deal_properties__sale_commission {
       float: left;
-      width: 20%;
-      padding-right: 10px;
+      width: 50%;
+      padding-left: 5px;
     }
     .deal_properties__communal_included {
       float: left;
-      width: 30%;
-      padding-right: 10px;
+      width: 100%;
       .communal_included {
         position: relative;
         padding-top: 15px;
@@ -235,56 +272,45 @@
         }
       }
     }
-    .deal_properties__sale_date {
-      float: left;
-      width: 20%;
-      padding-right: 10px;
-      .sale_date {
-        border: none;
-        width: 100%;
-        cursor: pointer;
-        font-size: 12px;
-        font-family: "Arial", sans-serif;
-        color: #777;
-      }
-      .sale_date__calendar {
-        right: -1px;
-        top: 24px;
-        border: 1px solid #c2cad8;
+  }
+
+  .action_buttons {
+    display: block;
+    float: right;
+    color: #fff;
+    background-color: #ee6052;
+    font-weight: 600;
+    touch-action: manipulation;
+    cursor: pointer;
+    border: 1px solid #ee6052;
+    outline: none;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    user-select: none;
+    line-height: 20px;
+    transition: border-color .5s, background-color .15s;
+    &._active {
+      border: 1px solid #32c5d2;
+      background-color: #32c5d2;
+      &:hover {
+        background-color: #26a1ab;
+        border-color: #2499a3;
       }
     }
   }
-
-  .deal_participants {
-    &:after { @include clearfix }
-    padding: 10px;
-    .deal_participants__label_field {
-      float: left;
-      width: 10%;
-      padding-right: 10px;
-    }
-    .deal_participants__employee_field {
-      float: left;
-      width: 30%;
-      padding-right: 10px;
-    }
-    .deal_participants__partner_field {
-      float: left;
-      width: 30%;
-      padding-right: 10px;
-    }
-  }
-
 
 </style>
 
 <script>
   import firebase from '../../firebase.js';
+  import hlp from '../../helpers/helpers.js';
   import Datepicker from 'vuejs-datepicker';
   import AddrField from '../address-field/address-field.vue';
   import DefaultField from '../default-field/default-field.vue';
 
-   const defaultCity = {
+  const revenueRef = firebase.database().ref('revenue');
+  const defaultCity = {
     contentType: 'city',
     id: '7600000100000',
     name: 'Ярославль',
@@ -314,14 +340,36 @@
           created: new Date(),
           modified: '',
           price: '',
-          communal_included: '',
+          communal_included: false,
           commission: '',
           partner: '',
           employee: ''
         }
       }
     },
+    computed: {
+      currentField() {
+        if ( hlp._isEmptyObject(this.address.city) ) return 'city';
+        if ( hlp._isEmptyObject(this.address.street) ) return 'street';
+        if ( hlp._isEmptyObject(this.address.building) ) return 'building';
+        if ( this.address.room === '' ) return 'room';
+        if ( this.newSale.created === '' ) return 'created';
+        if ( this.newSale.employee === '' ) return 'employee';
+        if ( this.newSale.partner === '' ) return 'partner';
+        if ( this.newSale.price === '' ) return 'price';
+        if ( this.newSale.commission === '' ) return 'commission';
+        return 'complete';
+      }
+    },
     methods: {
+      onClick(event) {
+        if ( this.currentField === 'complete' ) {
+          let sale = this.newSale;
+          sale.created = hlp._dateToUnix(sale.created);
+          sale.address = this.address;
+          revenueRef.push(sale);
+        }
+      },
       onObjectSelect(object) {
         if ( typeof object !== 'undefined' ) {
           this.$set(this.address, object.contentType, object)

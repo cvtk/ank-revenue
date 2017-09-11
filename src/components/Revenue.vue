@@ -12,8 +12,8 @@
           <div :class="$style.table_period">
             <span :class="$style.table_period__button">Квартал</span>
             <span :class="$style.table_period__button">Месяц</span>
-            <span :class="$style.table_period__button">Неделя</span>
-            <span :class="[ $style.table_period__button, $style._active ]">Сегодня</span>
+            <span :class="$style.table_period__button" @click="setPeriod().week()">Неделя</span>
+            <span :class="[ $style.table_period__button, $style._active ]" @click="setPeriod().day()">Сегодня</span>
           </div>
         </div>
       </div>
@@ -41,7 +41,16 @@
             <th :class="$style.items_list__column">Сотрудник</th>
           </tr>
         </thead>
-        <tbody :class="$style.items_list__content"></tbody>
+        <tbody :class="$style.items_list__content">
+          <tr :class="$style.items_list__row" v-for="sale in sales">
+            <td :class="$style.items_list__column">{{ sale.created }}</td>
+            <td :class="$style.items_list__column">{{ sale.address.city.name }}, {{ sale.address.street.name }}</td>
+            <td :class="$style.items_list__column">{{ sale.price }}</td>
+            <td :class="$style.items_list__column">{{ sale.commission }}</td>
+            <td :class="$style.items_list__column">{{ sale.partner }}</td>
+            <td :class="$style.items_list__column">{{ sale.employee }}</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
@@ -178,8 +187,12 @@
     border-bottom: 1px solid #e7ecf1;
     box-sizing: content-box;
     border-spacing: 0;
-    .items_list__header { /* */ }
-    .items_list__row { /* */ }
+    .items_list__header .items_list__column {
+      font-weight: 600;
+      font-size: 14px;
+      background-color: #e7ecf1;
+    }
+    .items_list__row:nth-child(even) { background-color: #eff3f8 }
     .items_list__column {
       &:first-child { border-left: 1px solid #e7ecf1 }
       border-right: 1px solid #e7ecf1;
@@ -187,21 +200,64 @@
       text-align: center;
       outline: 0;
       vertical-align: middle;
-      font-weight: 600;
+      font-weight: 300;
+      font-size: 13px;
     }
   }
 
 </style>
 
 <script>
+  import firebase from '../firebase.js';
+  import hlp from '../helpers/helpers.js';
   import CreateSale from './revenue-component/create-sale.vue';
+
+  const revenueRef = firebase.database().ref('revenue');
 
   export default {
     name: 'revenue',
     components: { CreateSale },
     data() {
       return {
+        sales: {},
+        endAt: '',
+        startAt: '',
         showSaleCreateForm: false
+      }
+    },
+    created() {
+      let defaultDateToday = new Date(),
+          startAt = defaultDateToday.setHours(0, 0, 0, 0),
+          endAt = defaultDateToday.setHours(24, 0, 0, 0);
+
+      this.startAt = hlp._dateToUnix(startAt);
+      this.endAt = hlp._dateToUnix(endAt);
+
+      revenueRef.orderByChild('created').startAt(this.startAt).endAt(this.endAt).on('value', sales => {
+        sales.forEach(sale => {
+          this.$set( this.sales, sale.key, sale.val() );
+        });
+      })
+    },
+    methods: {
+      setPeriod() {
+        let dateObject = new Date(),
+            endDate = dateObject.setHours(24, 0, 0, 0),
+            startDate = '';
+
+        this.endAt = hlp._dateToUnix(endDate);
+
+        return {
+          day() {
+            console.log(this.startAt);
+            startDate = dateObject.setHours(0, 0, 0, 0),
+            this.startAt = hlp._dateToUnix(startDate);
+          },
+          week() {
+            startDate = new Date(dateObject.getFullYear(), dateObject.getMonth(), dateObject.getDate() - 7);
+            this.startAt = hlp._dateToUnix(startDate);
+          },
+        }
       }
     }
   }
