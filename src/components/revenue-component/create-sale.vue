@@ -6,7 +6,7 @@
         <div :class="$style.address_input__city_field">
           <addr-field contentType="city" label="Город" 
             v-model="city"
-            :isDone="city === address.city.name"
+            :isDone="city === newSale.city.name"
             :needAttention="currentField === 'city'"
             @objectSelect="onObjectSelect"
           />
@@ -14,34 +14,34 @@
         <div :class="$style.address_input__street_field">
           <addr-field contentType="street" label="Улица"
             v-model="street"
-            :isDone="street === address.street.name"
+            :isDone="street === newSale.street.name"
             :needAttention="currentField === 'street'"
             @objectSelect="onObjectSelect"
-            :parentId="address.city.id"
+            :parentId="newSale.city.id"
           />
         </div>
         <div :class="$style.address_input__building_field">
           <addr-field contentType="building" label="Дом"
             v-model="building"
-            :isDone="building === address.building.name"
+            :isDone="building === newSale.building.name"
             :needAttention="currentField === 'building'"
             @objectSelect="onObjectSelect"
-            :parentId="address.street.id"
+            :parentId="newSale.street.id"
           />
         </div>
         <div :class="$style.address_input__room_field">
           <default-field label="Квартира"
-            v-model="address.room"
+            v-model="newSale.room"
             type="number"
             min="1"
             max="999"
-            :isDone="address.room"
+            :isDone="newSale.room"
             :needAttention="currentField === 'room'"
           />
         </div>
         <div :class="$style.address_input__sale_date">
           <default-field type="custom"
-            label="Дата продажи"
+            label="Дата"
             :isDone="newSale.created !== ''"
             :needAttention="currentField === 'created'">
             <datepicker
@@ -49,6 +49,7 @@
               :calendar-class="$style.sale_date__calendar"
               language="ru" 
               v-model="newSale.created"
+              :monday-first="true"
             />
           </default-field>
         </div>
@@ -105,16 +106,19 @@
       </div>
     </div>
     <div :class="$style.create_sale__action_buttons">
-      <span :class="[ $style.action_buttons, currentField === 'complete' && $style._active ]" tabindex="0" @click="onClick">Сохранить</span>
+      <span :class="[ $style.action_buttons, $style._remove ]" v-if="sale" tabindex="0" @click="onRemove">Удалить</span>
+      <span :class="[ $style.action_buttons, currentField === 'complete' && $style._active ]" tabindex="0" @click="onSave">Сохранить</span>
     </div>
   </div>
 </template>
 
 <style lang="scss" module>
   @import "../../assets/styles/mixins.scss";
+
   .create_sale {
+
     &:after { @include clearfix }
-    border: 1px solid #c2cad8;
+    background-color: #fff;
     .create_sale__address_input {
       &:after { @include clearfix }
       float: left;
@@ -134,7 +138,12 @@
       &:after { @include clearfix }
       position: relative;
       clear: both;
-      margin: 15px;
+      margin: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .create_sale__address_input { width: 100%; margin-bottom: 0 }
+      .create_sale__deal_properties { width: 100%; border: none }
     }
   }
 
@@ -182,7 +191,7 @@
         font-size: 12px;
         font-family: "Arial", sans-serif;
         color: #777;
-        padding-bottom: 4px;
+        padding-bottom: 3px;
         vertical-align: middle;
       }
       .sale_date__calendar {
@@ -289,7 +298,14 @@
     font-size: 14px;
     user-select: none;
     line-height: 20px;
-    transition: border-color .5s, background-color .15s;
+    transition: border-color .25s, background-color .25s;
+    &:hover {
+      background-color: #e12330;
+      border-color: #dc1e2b;
+    }
+    &._remove {
+      float: left;
+    }
     &._active {
       border: 1px solid #32c5d2;
       background-color: #32c5d2;
@@ -304,6 +320,7 @@
 
 <script>
   import firebase from '../../firebase.js';
+  import fireface from '../../helpers/firebase-iface.js';
   import hlp from '../../helpers/helpers.js';
   import Datepicker from 'vuejs-datepicker';
   import AddrField from '../address-field/address-field.vue';
@@ -332,27 +349,42 @@
   export default {
     name: 'create-sale',
     components: { AddrField, Datepicker, DefaultField },
+    props: ['sale'],
     data() {
       return {
         city: 'Ярославль', street: '', building: '',
-        address: { city: defaultCity, street: {}, building: {}, room: '' },
         newSale: {
           created: new Date(),
+          key: '',
           modified: '',
           price: '',
           communal_included: false,
           commission: '',
           partner: '',
-          employee: ''
+          employee: '',
+          city: defaultCity,
+          street: {},
+          building: {},
+          room: ''
         }
+      }
+    },
+    created() {
+      if ( typeof this.sale !== 'undefined' ) {
+        this.city = this.sale.city.name;
+        this.street = this.sale.street.name;
+        this.building = this.sale.building.name;
+        this.newSale.address = this.sale.address;
+        this.sale.created = new Date(this.sale.created * 1000);
+        this.newSale = this.sale;
       }
     },
     computed: {
       currentField() {
-        if ( hlp._isEmptyObject(this.address.city) ) return 'city';
-        if ( hlp._isEmptyObject(this.address.street) ) return 'street';
-        if ( hlp._isEmptyObject(this.address.building) ) return 'building';
-        if ( this.address.room === '' ) return 'room';
+        if ( hlp._isEmptyObject(this.newSale.city) || this.city !== this.newSale.city.name ) return 'city';
+        if ( hlp._isEmptyObject(this.newSale.street) || this.street !== this.newSale.street.name ) return 'street';
+        if ( hlp._isEmptyObject(this.newSale.building) || this.building !== this.newSale.building.name ) return 'building';
+        if ( this.newSale.room === '' ) return 'room';
         if ( this.newSale.created === '' ) return 'created';
         if ( this.newSale.employee === '' ) return 'employee';
         if ( this.newSale.partner === '' ) return 'partner';
@@ -362,17 +394,19 @@
       }
     },
     methods: {
-      onClick(event) {
+      onRemove(event) {
+        revenueRef.child(this.newSale.key).remove();
+        this.$emit('save', true);
+      },
+
+      onSave(event) {
         if ( this.currentField === 'complete' ) {
-          let sale = this.newSale;
-          sale.created = hlp._dateToUnix(sale.created);
-          sale.address = this.address;
-          revenueRef.push(sale);
+          fireface.revenue.save(this.newSale).then( ()=> this.$emit('save', true) )
         }
       },
       onObjectSelect(object) {
         if ( typeof object !== 'undefined' ) {
-          this.$set(this.address, object.contentType, object)
+          this.$set(this.newSale, object.contentType, object)
           this[object.contentType] = object.name;
         }
       }

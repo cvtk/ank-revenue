@@ -1,5 +1,8 @@
 <template>
   <div :class="$style.revenue_component">
+    <modal-overlay :show="showModal" @close="onModalClose">
+      <create-sale @save="onSave" :sale="editingSale" />
+    </modal-overlay>
     <div :class="$style.revenue_component__tool_bar">
       <div :class="$style.tool_bar">
         <div :class="$style.tool_bar__table_caption">
@@ -10,18 +13,31 @@
         </div>
         <div :class="$style.tool_bar__table_period">
           <div :class="$style.table_period">
-            <span :class="[ $style.table_period__button, dateRange === 'quarter' && $style._active ]" @click="dateRange = 'quarter'">Квартал</span>
-            <span :class="[ $style.table_period__button, dateRange === 'month' && $style._active ]" @click="dateRange = 'month'">Месяц</span>
-            <span :class="[ $style.table_period__button, dateRange === 'week' && $style._active ]" @click="dateRange = 'week'">Неделя</span>
-            <span :class="[ $style.table_period__button, dateRange === 'today' && $style._active ]" @click="dateRange = 'today'">Сегодня</span>
+            <span title="В текущем квартале" 
+              :class="[ $style.table_period__button, dateRange === 'quarter' && $style._active ]" 
+              @click="dateRange = 'quarter'">Квартал
+            </span>
+            <span title="В этом месяце"
+              :class="[ $style.table_period__button, dateRange === 'month' && $style._active ]"
+              @click="dateRange = 'month'">Месяц
+            </span>
+            <span title="На этой неделе"
+              :class="[ $style.table_period__button, dateRange === 'week' && $style._active ]"
+              @click="dateRange = 'week'">Неделя
+            </span>
+            <span title="Сегодня"
+              :class="[ $style.table_period__button, dateRange === 'today' && $style._active ]"
+              @click="dateRange = 'today'">Сегодня
+            </span>
           </div>
         </div>
       </div>
     </div>
-
-    <div :class="$style.revenue_component__create_sale" v-show="showSaleCreateForm">
-      <create-sale />
-    </div>
+    <transition name="fade" appear>
+      <div :class="$style.revenue_component__create_sale" v-if="showSaleCreateForm">
+        <create-sale @save="onSave" />
+      </div>
+    </transition>
     
     <div :class="$style.revenue_component__list_actions">
       <div :class="$style.list_actions">
@@ -42,13 +58,22 @@
           </tr>
         </thead>
         <tbody :class="$style.items_list__content">
-          <sales-row v-for="sale in sales" :sale="sale" :key="sale.key" />
+          <transition name="fade" appear>
+            <sales-row v-for="sale in salesByTimestamp" :sale="sale" :key="sale.key" @select="onSelect" />
+          </transition>
         </tbody>
       </table>
     </div>
   </div>
 </template>
-
+<style>
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .35s
+  }
+  .fade-enter, .fade-leave-to {
+    opacity: 0
+  }
+</style>
 <style lang="scss" module>
   @import "../assets/styles/mixins.scss";
   .revenue_component {
@@ -59,7 +84,9 @@
       padding-bottom: 10px;
     }
     .revenue_component__create_sale {
-      padding: 10px 0;
+      position: relative;
+      margin: 10px 0;
+      border: 1px solid #c2cad8;
     }
     .revenue_component__list_actions {
       &:after { @include clearfix }
@@ -177,24 +204,19 @@
     width: 100%;
     margin: 0;
     border-top: 1px solid #e7ecf1;
-    border-bottom: 1px solid #e7ecf1;
     box-sizing: content-box;
     border-spacing: 0;
-    .items_list__header .items_list__column {
-      font-weight: 600;
-      font-size: 14px;
-      background-color: #e7ecf1;
-    }
-    .items_list__row:nth-child(even) { background-color: #eff3f8 }
+    .items_list__row { /* */ }
     .items_list__column {
       &:first-child { border-left: 1px solid #e7ecf1 }
+      font-weight: 600;
+      font-size: 14px;
+      background-color: #eff3f8;
       border-right: 1px solid #e7ecf1;
+      border-bottom: 1px solid #aaa;
       padding: 10px 5px;
       text-align: center;
-      outline: 0;
       vertical-align: middle;
-      font-weight: 300;
-      font-size: 13px;
     }
   }
 
@@ -205,17 +227,23 @@
   import hlp from '../helpers/helpers.js';
   import CreateSale from './revenue-component/create-sale.vue';
   import SalesRow from './revenue-component/sales-row.vue';
+  import ModalOverlay from './modal-overlay/modal-overlay.vue';
 
+  const moment = require('moment');
   const revenueRef = firebase.database().ref('revenue');
+
+  moment.locale('ru');
 
   export default {
     name: 'revenue',
-    components: { CreateSale, SalesRow },
+    components: { CreateSale, SalesRow, ModalOverlay },
     data() {
       return {
+        editingSale: {},
         sales: {},
         dateRange: 'week',
-        showSaleCreateForm: false
+        showSaleCreateForm: false,
+        showModal: false
       }
     },
     watch: {
@@ -227,27 +255,45 @@
     mounted() {
       this.onDateRangeChange();
     },
-
+    computed: {
+      salesByTimestamp: function() {
+        if ( hlp._isEmptyObject(this.sales) || !this.sales ) return false
+        else {
+          let arr = Object.keys(this.sales).map(key => this.sales[key] );
+          return arr.sort((x, y) => y.created - x.created);
+        }
+      }
+    },
     methods: {
-      endAt() {
-        let dateObject = new Date();
-        return hlp._dateToUnix(dateObject.setHours(24, 0, 0, 0));
+      onSelect(object) {
+        this.editingSale = JSON.parse( JSON.stringify(object) );
+        this.showModal = true;
+      },
+      onModalClose(event) {
+        this.showModal = false;
       },
 
+      onSave(result) {
+        if ( result ) {
+          this.showSaleCreateForm = false;
+          this.showModal = false;
+        }
+      },
       startAt() {
-        let dateObject = new Date(), startAt = '';
+        let startAt = '';
 
         switch ( this.dateRange ) {
-          case 'week': startAt = new Date(dateObject.getFullYear(), dateObject.getMonth(), dateObject.getDate() - 7); break;
-          case 'month': startAt = new Date(dateObject.getFullYear(), dateObject.getMonth() - 1, 1); break;
-          case 'quarter': startAt = new Date(dateObject.getFullYear(), dateObject.getMonth() - 3, 1); break;
-          default: startAt = dateObject.setHours(0, 0, 0, 0); break;
+          case 'week': startAt = moment().startOf('week'); break;
+          case 'month': startAt = moment().startOf('month'); break;
+          case 'quarter': startAt = moment().startOf('quarter'); break;
+          default: startAt = moment().startOf('day');  break;
         }
         return hlp._dateToUnix(startAt);
       },
 
       onDateRangeChange() {
-        let ref = revenueRef.orderByChild('created').startAt(this.startAt()).endAt(this.endAt());
+        this.sales = [];
+        let ref = revenueRef.orderByChild('created').startAt(this.startAt());
         ref.off( 'value', this.firebaseValueCallback );
         ref.on( 'value', this.firebaseValueCallback );
       },
