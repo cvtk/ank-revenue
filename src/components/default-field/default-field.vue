@@ -25,6 +25,13 @@
       @focus="fieldFocused = true"
       @blur="onBlur"
     />
+    <input v-if="type === 'password'" type="password" :value="value"
+      :class="$style.default_field__input"
+      :id="id"
+      @input="onInput"
+      @focus="fieldFocused = true"
+      @blur="onBlur"
+    />
     
     </div>
   </div>
@@ -93,7 +100,7 @@
       transition: font-size .15s, top .15s, left .15s, color .15s;
       &._overhead {
         font-size: 11px;
-        top: -2px;
+        top: -3px;
         left: 0;
         color: #ee6052;
       }

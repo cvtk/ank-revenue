@@ -1,7 +1,7 @@
 <template>
   <transition name="modal" appear>
-    <div :class="$style.modal_overlay" transition="modal" v-if="show || false" @click.self="closeModal">
-      <div :class="$style.modal_overlay__close_button" @click="closeModal"></div>
+    <div :class="[ $style.modal_overlay, layoutImage && $style._image ]" v-if="show" @click.self="closeModal">
+      <div :class="$style.modal_overlay__close_button" @click="closeModal" v-if="closeButton"></div>
       <div :class="$style.modal_overlay__content_slot" id="hR2ykz_">
         <slot></slot>
       </div>
@@ -34,6 +34,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    &._image {
+      background-image: url("./layout.jpg");
+      background-size: cover;
+      background-color: rgba(0, 0, 0, .25);
+    }
   }
 
   .modal_overlay__close_button {
@@ -49,7 +54,9 @@
   }
 
   .modal_overlay__content_slot {
-    @include container;
+    @media (min-width: 768px) { max-width: 750px }
+    @media (min-width: 992px) { max-width: 970px }
+    @media (min-width: 1200px) { max-width: 1170px }
     padding: 0;
     z-index: 9999;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .6);
@@ -60,7 +67,11 @@
 <script>
   export default {
     name: 'modal-overlay',
-    props: [ 'show' ],
+    props: {
+      show: { default: false, type: Boolean },
+      layoutImage: { default: false, type: Boolean },
+      closeButton: { default: true, type: Boolean }
+    },
     methods: {
       closeModal() {
         this.$emit('close');

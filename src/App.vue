@@ -1,5 +1,6 @@
 <template>
   <div :class="$style.app">
+    <login :isAuth="isAuth" />
     <div :class="$style.app__page_header">
       <div :class="$style.page_header">
         <div :class="$style.page_header__company_logo">
@@ -12,12 +13,12 @@
         <div :class="$style.page_header__user_menu">
           <div :class="$style.user_menu">
             <div :class="$style.user_menu__app_logout">
-              <img src="./assets/icons/logout.svg" alt="Выход" :class="$style.app_logout" title="Выйти">
+              <img src="./assets/icons/logout.svg" alt="Выход" :class="$style.app_logout" @click="appLogout" title="Выйти">
             </div>
             <div :class="$style.user_menu__employee_profile">
               <div :class="$style.employee_profile">
                 <img :class="$style.employee_profile__photo" src="./assets/images/user.png">
-                <span :class="$style.employee_profile__name">Сергей Иванов</span>
+                <span :class="$style.employee_profile__name" v-if="isAuth">{{ auth.email }}</span>
               </div>
             </div>
           </div>
@@ -174,7 +175,26 @@
 </style>
 
 <script>
+  import firebase from './firebase.js';
+  import hlp from './helpers/helpers.js';
+  import Login from './components/Login.vue';
   export default {
     name: 'app',
+    components: { Login },
+    data() {
+      return { auth: {}, isAuth: false }
+    },
+    methods: {
+      appLogout() {
+        firebase.auth().signOut();
+      }
+    },
+    beforeCreate() {
+      firebase.auth().onAuthStateChanged( (auth)=> {
+        this.auth = auth;
+        if ( this.auth === null ) this.isAuth = false
+        else this.isAuth = true;
+      });
+    },
   }
 </script>
