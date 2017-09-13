@@ -1,7 +1,10 @@
 <template>
   <tr :class="$style.sales_row" v-if="dataLoaded" @click="onClick">
     <td :class="$style.sales_row__column">{{ sale.created | _unixToHumanDate }}</td>
-    <td :class="$style.sales_row__column">{{ sale.city.name }}, {{ sale.street.name }}</td>
+    <td :class="$style.sales_row__column">
+      {{ sale.city.typeShort }}. {{ sale.city.name }},
+      {{ sale.city.typeShort }}. {{ sale.street.name }},
+      {{ sale.building.typeShort }}. {{ sale.building.name }}</td>
     <td :class="$style.sales_row__column">{{ sale.price | _priceFormat }}<span :class="$style.ruble_icon"></span></td>
     <td :class="$style.sales_row__column">{{ sale.commission | _priceFormat }}<span :class="$style.ruble_icon"></span></td>
     <td :class="$style.sales_row__column">{{ sale.partner }}</td>

@@ -1,6 +1,7 @@
 import firebase from '../firebase.js';
 
 const revenueRef = firebase.database().ref('revenue');
+const moment = require('moment');
 const model = {
   created: 'date',
   price: 'int',
@@ -14,6 +15,8 @@ const model = {
   building: 'object',
   room: 'text'
 }
+
+moment.locale('ru');
 
 function _each(object, callback) {
   Object.keys(object).map(function(key, index) {
@@ -89,6 +92,25 @@ export default {
         return revenueRef.child(sale.key).update(sale);
  
       } else return checkResult;
+    },
+
+    byCreated: function(range, onPage = 10) {
+      let tmp = { startAt: 0, endAt: 0 };
+      switch(range.startAt) {
+        case 'week': tmp.startAt = moment().startOf('week'); break;
+        case 'month': tmp.startAt = moment().startOf('month'); break;
+        case 'quarter': tmp.startAt = moment().startOf('quarter'); break;
+        case 'all': tmp.startAt = moment(0); break;
+        default: tmp.startAt = moment().startOf('day');  break;
+      }
+      tmp.startAt = _toUnix(tmp.startAt);
+
+      if ( _isInt(range.endAt) ) tmp.endAt = range.endAt
+      else if ( _isDate(range.endAt) ) tmp.endAt = _toUnix(range.endAt)
+      else tmp.endAt = _toUnix(new Date);
+
+      return revenueRef.orderByChild('created').endAt(tmp.endAt).startAt(tmp.startAt).limitToLast(onPage);
+
     }
   }
 }

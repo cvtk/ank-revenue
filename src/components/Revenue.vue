@@ -13,21 +13,25 @@
         </div>
         <div :class="$style.tool_bar__table_period">
           <div :class="$style.table_period">
+            <span title="За все время" 
+              :class="[ $style.table_period__button, startAt === 'all' && $style._active ]" 
+              @click="startAt = 'all'">Все
+            </span>
             <span title="В текущем квартале" 
-              :class="[ $style.table_period__button, dateRange === 'quarter' && $style._active ]" 
-              @click="dateRange = 'quarter'">Квартал
+              :class="[ $style.table_period__button, startAt === 'quarter' && $style._active ]" 
+              @click="startAt = 'quarter'">Квартал
             </span>
             <span title="В этом месяце"
-              :class="[ $style.table_period__button, dateRange === 'month' && $style._active ]"
-              @click="dateRange = 'month'">Месяц
+              :class="[ $style.table_period__button, startAt === 'month' && $style._active ]"
+              @click="startAt = 'month'">Месяц
             </span>
             <span title="На этой неделе"
-              :class="[ $style.table_period__button, dateRange === 'week' && $style._active ]"
-              @click="dateRange = 'week'">Неделя
+              :class="[ $style.table_period__button, startAt === 'week' && $style._active ]"
+              @click="startAt = 'week'">Неделя
             </span>
             <span title="Сегодня"
-              :class="[ $style.table_period__button, dateRange === 'today' && $style._active ]"
-              @click="dateRange = 'today'">Сегодня
+              :class="[ $style.table_period__button, startAt === 'today' && $style._active ]"
+              @click="startAt = 'today'">Сегодня
             </span>
           </div>
         </div>
@@ -35,7 +39,7 @@
     </div>
     <transition name="fade" appear>
       <div :class="$style.revenue_component__create_sale" v-if="showSaleCreateForm">
-        <create-sale @save="onSave" />
+        <create-sale @save="onSave"></create-sale>
       </div>
     </transition>
     
@@ -44,7 +48,7 @@
         <span :class="$style.list_actions__add_new" @click="showSaleCreateForm = !showSaleCreateForm">Добавить</span>
       </div>
     </div>
-
+    <div><span @click="prevPage"> << </span>    <span @click="nextPage"> >> </span> </div>
     <div :class="$style.revenue_component__items_list">
       <table :class="$style.items_list">
         <thead :class="$style.items_list__header">
@@ -57,11 +61,11 @@
             <th :class="$style.items_list__column">Сотрудник</th>
           </tr>
         </thead>
-        <tbody :class="$style.items_list__content">
-          <transition name="fade" appear>
-            <sales-row v-for="sale in salesByTimestamp" :sale="sale" :key="sale.key" @select="onSelect" />
-          </transition>
-        </tbody>
+        <transition name="fade" appear>
+          <tbody :class="$style.items_list__content">
+              <sales-row v-for="sale in salesByTimestamp" :sale="sale" :key="sale.key" @select="onSelect" />
+          </tbody>
+        </transition>
       </table>
     </div>
   </div>
@@ -206,6 +210,7 @@
     border-top: 1px solid #e7ecf1;
     box-sizing: content-box;
     border-spacing: 0;
+    .items_list__content { transition: opacity .3s }
     .items_list__row { /* */ }
     .items_list__column {
       &:first-child { border-left: 1px solid #e7ecf1 }
@@ -223,16 +228,11 @@
 </style>
 
 <script>
-  import firebase from '../firebase.js';
+  import fireface from '../helpers/firebase-iface.js';
   import hlp from '../helpers/helpers.js';
   import CreateSale from './revenue-component/create-sale.vue';
   import SalesRow from './revenue-component/sales-row.vue';
   import ModalOverlay from './modal-overlay/modal-overlay.vue';
-
-  const moment = require('moment');
-  const revenueRef = firebase.database().ref('revenue');
-
-  moment.locale('ru');
 
   export default {
     name: 'revenue',
@@ -241,13 +241,19 @@
       return {
         editingSale: {},
         sales: {},
-        dateRange: 'week',
+        startAt: 'week',
+        endAt: new Date,
         showSaleCreateForm: false,
-        showModal: false
+        showModal: false,
+        currentRef: ''
       }
     },
     watch: {
-      dateRange(period) {
+      startAt(value) {
+        this.onDateRangeChange();
+      },
+      endAt(value) {
+        console.log(value);
         this.onDateRangeChange();
       }
     },
@@ -255,6 +261,7 @@
     mounted() {
       this.onDateRangeChange();
     },
+
     computed: {
       salesByTimestamp: function() {
         if ( hlp._isEmptyObject(this.sales) || !this.sales ) return false
@@ -265,39 +272,46 @@
       }
     },
     methods: {
+      nextPage() {
+        let arr = hlp._objToArr(this.sales),
+            endAt = Math.min.apply(Math, arr.map( (obj) => obj.created ));
+        console.log(endAt);
+        this.endAt = endAt;
+      },
+
+      prevPage() {
+        let arr = hlp._objToArr(this.sales),
+            endAt = Math.max.apply(Math, arr.map( (obj) => obj.created ));
+        console.log(endAt);
+        this.endAt = endAt;
+      },
+
       onSelect(object) {
         this.editingSale = JSON.parse( JSON.stringify(object) );
         this.showModal = true;
       },
+
       onModalClose(event) {
         this.showModal = false;
       },
 
       onSave(result) {
-        if ( result ) {
-          this.showSaleCreateForm = false;
-          this.showModal = false;
-        }
-      },
-      startAt() {
-        let startAt = '';
-
-        switch ( this.dateRange ) {
-          case 'week': startAt = moment().startOf('week'); break;
-          case 'month': startAt = moment().startOf('month'); break;
-          case 'quarter': startAt = moment().startOf('quarter'); break;
-          default: startAt = moment().startOf('day');  break;
-        }
-        return hlp._dateToUnix(startAt);
+        this.showSaleCreateForm = false;
+        this.showModal = false;
       },
 
       onDateRangeChange() {
-        this.sales = [];
-        let ref = revenueRef.orderByChild('created').startAt(this.startAt());
-        ref.off( 'value', this.firebaseValueCallback );
-        ref.on( 'value', this.firebaseValueCallback );
+        let range = { startAt: this.startAt, endAt: this.endAt };
+        console.log(range.endAt)
+        if ( this.currentRef ) {
+          this.currentRef.off( 'value', this.firebaseValueCallback );
+        }
+        this.currentRef = fireface.revenue.byCreated( range, 10 );
+        this.currentRef.on( 'value', this.firebaseValueCallback );
       },
+
       firebaseValueCallback(sales) {
+        console.log(sales.val());
         this.sales = sales.val();
       }
     }

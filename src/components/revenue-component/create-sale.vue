@@ -319,14 +319,12 @@
 </style>
 
 <script>
-  import firebase from '../../firebase.js';
   import fireface from '../../helpers/firebase-iface.js';
   import hlp from '../../helpers/helpers.js';
   import Datepicker from 'vuejs-datepicker';
   import AddrField from '../address-field/address-field.vue';
   import DefaultField from '../default-field/default-field.vue';
 
-  const revenueRef = firebase.database().ref('revenue');
   const defaultCity = {
     contentType: 'city',
     id: '7600000100000',
@@ -374,7 +372,6 @@
         this.city = this.sale.city.name;
         this.street = this.sale.street.name;
         this.building = this.sale.building.name;
-        this.newSale.address = this.sale.address;
         this.sale.created = new Date(this.sale.created * 1000);
         this.newSale = this.sale;
       }
@@ -401,7 +398,8 @@
 
       onSave(event) {
         if ( this.currentField === 'complete' ) {
-          fireface.revenue.save(this.newSale).then( ()=> this.$emit('save', true) )
+          fireface.revenue.save(this.newSale)
+            .then( ()=> this.$emit('save') )
         }
       },
       onObjectSelect(object) {

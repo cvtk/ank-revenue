@@ -17,6 +17,11 @@ export default {
     return moment(epoch * 1000).calendar();
   },
 
+  _objToArr(obj) {
+    let arr = Object.keys( obj ).map( (key) => obj[key] );
+    return arr;
+  },
+
   _priceFormat: function (number) {
     number = number.toString();
     number = typeof number != "undefined" && number > 0 ? number : "";
