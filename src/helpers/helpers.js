@@ -2,6 +2,10 @@ var moment = require('moment');
 moment.locale('ru');
 
 export default {
+  _moment(date) {
+    return moment(date);
+  },
+
   _dateToUnix(date) {
     return parseInt((new Date(date).getTime() / 1000).toFixed(0));
   },

@@ -3,11 +3,11 @@
     <div :class="$style._row">
       <div :class="$style.root__portlet">
         <default-portlet label="Продажи" v-model="salesRange">
-          <default-chart />
+          <default-chart :startAt="salesStartAt" />
         </default-portlet>
       </div>
       <div :class="$style.root__portlet">
-        <default-portlet>
+        <default-portlet label="Активность" v-model="employeeRange">
           portlet 2
         </default-portlet>
       </div>
@@ -51,12 +51,24 @@
     components: { DefaultPortlet, DefaultChart },
     data() {
       return {
-        salesData: null,
         salesRange: [
           { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
           { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
-          { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false }
+          { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
+          { label: 'Все', title: 'За все время', value: 'all', isActive: false }
+        ],
+        employeeRange: [
+          { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
+          { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
+          { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
+          { label: 'Все', title: 'За все время', value: 'all', isActive: false }
         ]
+      }
+    },
+    computed: {
+      salesStartAt() {
+        let currentRange = this.salesRange.filter( item => item.isActive );
+        return currentRange[0].value;
       }
     }
   }

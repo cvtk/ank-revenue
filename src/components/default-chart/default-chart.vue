@@ -2,7 +2,7 @@
   <div :class="$style.chart">
     <line-chart v-if="type === 'sales'" 
       :chart-data="salesData"
-      :options="{ maintainAspectRatio: false }"
+      :options="lineChartOptions"
       :height="400">
     </line-chart>
   </div>
@@ -28,7 +28,13 @@
     data() {
       return {
         salesData: null,
-        currentRef: null
+        currentRef: null,
+        lineChartOptions: {
+          maintainAspectRatio: false,
+          scales: {
+            xAxes: [{ ticks: { minRotation: 90, labelOffset: -5 } }]
+          }
+        }
       }
     },
     mounted() {
@@ -36,17 +42,21 @@
         this.salesRemount();
       }
     },
+    watch: {
+      startAt(value) {
+        this.salesRemount();
+      }
+    },
     methods: {
       _iterateByDay(sales, callback) {
         let arr = [];
         h._objToArr(sales).forEach( item => {
-          let index = new Date(item.created * 1000).getDate();
+          let index = h._moment(item.created * 1000).dayOfYear();
           if(typeof arr[index] === 'undefined') {
             arr[index] = [];
           }
           arr[index].push(item);
         });
-
         arr.forEach( item => {
           if ( !h._isEmptyObject(item) ) {
             return callback(item);
@@ -64,35 +74,34 @@
       },
 
       salesCallback(sales) {
-        switch(this.startAt) {
-          case 'week': {
-            let days = { sum: [], date: [] };
-            this._iterateByDay(sales.val(), day => {
-              let sum = null;
-              day.forEach( item => sum += item.commission );
-              days.sum.push(sum);
-              days.date.push(h._unixToHumanDate(day[0].created));
-            })
-            this.salesData = {
-              labels: days.date,
-              datasets: [
-                {
-                  label: 'Офис №1',
-                  backgroundColor: 'rgba(92, 155, 209, 0.3)',
-                  borderColor: '#5C9BD1',
-                  borderWidth: 1,
-                  data: days.sum
-                }, 
-                {
-                  label: 'Офис №2',
-                  backgroundColor: 'rgba(239, 72, 54, 0.3)',
-                  borderColor: '#EF4836',
-                  borderWidth: 1,
-                  data: days.sum
-                }
-              ]
-            }
+        let days = { sum: [], date: [] };
+        this._iterateByDay(sales.val(), day => {
+          let sum = null,
+              date = null,
+              format = '';
+
+          switch(this.startAt) {
+            case 'week': format = 'ddd, MMM D'; break;
+            case 'all': format = 'DD.MM.YY'; break;
+            default: format = 'D MMM';
           }
+
+          date = h._moment(day[0].created * 1000).format(format);
+          day.forEach( item => sum += item.commission );
+          days.sum.push(sum);
+          days.date.push(date);
+        });
+        this.salesData = {
+          labels: days.date,
+          datasets: [
+            {
+              label: 'Общие продажи',
+              backgroundColor: 'rgba(92, 155, 209, 0.3)',
+              borderColor: '#5C9BD1',
+              borderWidth: 1,
+              data: days.sum
+            }
+          ]
         }
       },
 
