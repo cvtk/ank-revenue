@@ -253,7 +253,6 @@
         this.onDateRangeChange();
       },
       endAt(value) {
-        console.log(value);
         this.onDateRangeChange();
       }
     },
@@ -302,7 +301,6 @@
 
       onDateRangeChange() {
         let range = { startAt: this.startAt, endAt: this.endAt };
-        console.log(range.endAt)
         if ( this.currentRef ) {
           this.currentRef.off( 'value', this.firebaseValueCallback );
         }
@@ -311,7 +309,6 @@
       },
 
       firebaseValueCallback(sales) {
-        console.log(sales.val());
         this.sales = sales.val();
       }
     }

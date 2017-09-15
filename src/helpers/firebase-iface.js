@@ -109,7 +109,7 @@ export default {
       else if ( _isDate(range.endAt) ) tmp.endAt = _toUnix(range.endAt)
       else tmp.endAt = _toUnix(new Date);
 
-      return revenueRef.orderByChild('created').endAt(tmp.endAt).startAt(tmp.startAt).limitToLast(onPage);
+      return revenueRef.orderByChild('created').endAt(tmp.endAt).startAt(tmp.startAt);
 
     }
   }
