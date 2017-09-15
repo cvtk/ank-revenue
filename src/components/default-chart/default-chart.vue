@@ -35,25 +35,6 @@
       if ( this.type === 'sales' ) {
         this.salesRemount();
       }
-      this.salesData = {
-        labels: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt()],
-        datasets: [
-          {
-            label: 'Офис №1',
-            backgroundColor: 'rgba(92, 155, 209, 0.3)',
-            borderColor: '#5C9BD1',
-            borderWidth: 1,
-            data: [this.getRandomInt(), this.getRandomInt(),this.getRandomInt()]
-          }, 
-          {
-            label: 'Офис №2',
-            backgroundColor: 'rgba(239, 72, 54, 0.3)',
-            borderColor: '#EF4836',
-            borderWidth: 1,
-            data: [this.getRandomInt(), this.getRandomInt(),this.getRandomInt()]
-          }
-        ]
-      }
     },
     methods: {
       _iterateByDay(sales, callback) {
@@ -85,13 +66,32 @@
       salesCallback(sales) {
         switch(this.startAt) {
           case 'week': {
-            let days = [];
+            let days = { sum: [], date: [] };
             this._iterateByDay(sales.val(), day => {
               let sum = null;
               day.forEach( item => sum += item.commission );
-              days.push({ comission: sum, date: day[0].created })
+              days.sum.push(sum);
+              days.date.push(h._unixToHumanDate(day[0].created));
             })
-            console.log(days);
+            this.salesData = {
+              labels: days.date,
+              datasets: [
+                {
+                  label: 'Офис №1',
+                  backgroundColor: 'rgba(92, 155, 209, 0.3)',
+                  borderColor: '#5C9BD1',
+                  borderWidth: 1,
+                  data: days.sum
+                }, 
+                {
+                  label: 'Офис №2',
+                  backgroundColor: 'rgba(239, 72, 54, 0.3)',
+                  borderColor: '#EF4836',
+                  borderWidth: 1,
+                  data: days.sum
+                }
+              ]
+            }
           }
         }
       },
