@@ -1,5 +1,6 @@
 <template>
   <div :class="$style.chart">
+    <default-loader v-if="dataLoading" />
     <line-chart v-if="type === 'sales'" 
       :chart-data="salesData"
       :options="lineChartOptions"
@@ -9,17 +10,20 @@
 </template>
 
 <style lang="scss" module>
-  .chart {  }
+  .chart {
+    position: relative;
+  }
 </style>
 
 <script>
   import LineChart from './line-chart.js';
+  import DefaultLoader from '../default-loader/default-loader.vue';
   import fireface from '../../helpers/firebase-iface.js';
   import h from '../../helpers/helpers.js';
 
   export default {
     name: 'default-chart',
-    components: { LineChart },
+    components: { LineChart, DefaultLoader },
     props: {
       type: { default: 'sales', type: String },
       startAt: { default: 'week', type: String },
@@ -27,13 +31,12 @@
     },
     data() {
       return {
+        dataLoading: true,
         salesData: null,
         currentRef: null,
         lineChartOptions: {
-          maintainAspectRatio: false,
-          scales: {
-            xAxes: [{ ticks: { minRotation: 90, labelOffset: -5 } }]
-          }
+          elements: { point: { radius: 1, hitRadius: 2 } },
+          maintainAspectRatio: false
         }
       }
     },
@@ -65,6 +68,7 @@
       },
 
       salesRemount() {
+        this.dataLoading = true;
         let range = { startAt: this.startAt, endAt: this.endAt };
         if ( this.currentRef ) {
           this.currentRef.off( 'value', this.salesCallback );
@@ -91,6 +95,7 @@
           days.sum.push(sum);
           days.date.push(date);
         });
+        this.dataLoading = false;
         this.salesData = {
           labels: days.date,
           datasets: [
@@ -103,10 +108,6 @@
             }
           ]
         }
-      },
-
-      getRandomInt () {
-        return Math.floor(Math.random() * (50 - 5 + 1)) + 5
       }
     }
   }

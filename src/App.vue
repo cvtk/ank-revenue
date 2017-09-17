@@ -40,12 +40,7 @@
             </li>
           </ul>
         </div>
-        <div :class="$style.main_menu__app_search">
-          <form :class="$style.app_search" action="#">
-            <input :class="$style.app_search__input" type="text" placeholder="Поиск...">
-            <span :class="$style.app_search__button" title="Поиск"></span>
-          </form>
-        </div>
+        <div :class="$style.main_menu__app_search"></div>
       </div>
     </div>
     <div :class="$style.app__component_title">
@@ -122,36 +117,6 @@
       color: #BCC2CB;
       transition: color .25s ease, background-color .15s ease; 
       &._active, &:hover { color: #f1f1f1; background-color: #4E5966 }
-    }
-  }
-
-  .app_search {
-    position: relative;
-    margin: 8px 0;
-    .app_search__input {
-      color: #616d7d;
-      background-color: #38414c;
-      font-size: 13px;
-      width: 176px;
-      font-weight: 300;
-      height: 34px;
-      padding: 6px 12px;
-      padding-right: 34px;
-      border: none;
-      outline: none;
-      transition: width .4s;
-      &:focus { width: 300px }
-    }
-    .app_search__button {
-      position: absolute;
-      right: 8.5px;
-      top: 8.5px;
-      width: 17px;
-      height: 17px;
-      background-image: url("./assets/icons/search.svg");
-      background-repeat: no-repeat;
-      background-size: 100%;
-      cursor: pointer;
     }
   }
 

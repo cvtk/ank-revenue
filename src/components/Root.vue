@@ -3,12 +3,12 @@
     <div :class="$style._row">
       <div :class="$style.root__portlet">
         <default-portlet label="Продажи" v-model="salesRange">
-          <default-chart :startAt="salesStartAt" />
+          <default-chart :startAt="salesRange.current" />
         </default-portlet>
       </div>
       <div :class="$style.root__portlet">
-        <default-portlet label="Активность" v-model="employeeRange">
-          portlet 2
+        <default-portlet label="Сотрудники" v-model="employeeRange">
+          <sales-top :startAt="employeeRange.current" />
         </default-portlet>
       </div>
     </div>
@@ -45,30 +45,32 @@
 
   import DefaultPortlet from './default-portlet/default-portlet.vue';
   import DefaultChart from './default-chart/default-chart.vue';
+  import SalesTop from './sales-top/sales-top.vue';
 
   export default {
     name: 'root',
-    components: { DefaultPortlet, DefaultChart },
+    components: { DefaultPortlet, DefaultChart, SalesTop },
     data() {
       return {
-        salesRange: [
-          { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
-          { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
-          { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
-          { label: 'Все', title: 'За все время', value: 'all', isActive: false }
-        ],
-        employeeRange: [
-          { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
-          { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
-          { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
-          { label: 'Все', title: 'За все время', value: 'all', isActive: false }
-        ]
-      }
-    },
-    computed: {
-      salesStartAt() {
-        let currentRange = this.salesRange.filter( item => item.isActive );
-        return currentRange[0].value;
+        salesRange: {
+          current: 'week',
+          items: [
+            { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
+            { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
+            { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
+            { label: 'Год', title: 'В текущем году', value: 'year', isActive: false }
+          ]
+        },
+
+        employeeRange: {
+          current: 'week',
+          items: [
+            { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
+            { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
+            { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
+            { label: 'Год', title: 'В текущем году', value: 'year', isActive: false }
+          ]
+        }
       }
     }
   }

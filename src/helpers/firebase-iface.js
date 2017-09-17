@@ -100,6 +100,7 @@ export default {
         case 'week': tmp.startAt = moment().startOf('week'); break;
         case 'month': tmp.startAt = moment().startOf('month'); break;
         case 'quarter': tmp.startAt = moment().startOf('quarter'); break;
+        case 'year': tmp.startAt = moment().startOf('year'); break;
         case 'all': tmp.startAt = moment(0); break;
         default: tmp.startAt = moment().startOf('day');  break;
       }

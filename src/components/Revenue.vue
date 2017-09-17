@@ -12,28 +12,7 @@
           </div>
         </div>
         <div :class="$style.tool_bar__table_period">
-          <div :class="$style.table_period">
-            <span title="За все время" 
-              :class="[ $style.table_period__button, startAt === 'all' && $style._active ]" 
-              @click="startAt = 'all'">Все
-            </span>
-            <span title="В текущем квартале" 
-              :class="[ $style.table_period__button, startAt === 'quarter' && $style._active ]" 
-              @click="startAt = 'quarter'">Квартал
-            </span>
-            <span title="В этом месяце"
-              :class="[ $style.table_period__button, startAt === 'month' && $style._active ]"
-              @click="startAt = 'month'">Месяц
-            </span>
-            <span title="На этой неделе"
-              :class="[ $style.table_period__button, startAt === 'week' && $style._active ]"
-              @click="startAt = 'week'">Неделя
-            </span>
-            <span title="Сегодня"
-              :class="[ $style.table_period__button, startAt === 'today' && $style._active ]"
-              @click="startAt = 'today'">Сегодня
-            </span>
-          </div>
+          <default-radio :value="startAtRange" @input="onSelectRange" />
         </div>
       </div>
     </div>
@@ -46,27 +25,47 @@
     <div :class="$style.revenue_component__list_actions">
       <div :class="$style.list_actions">
         <span :class="$style.list_actions__add_new" @click="showSaleCreateForm = !showSaleCreateForm">Добавить</span>
+        <div :class="$style.list_actions__sales_search">
+          <div :class="$style.sales_search">
+            <input :class="$style.sales_search__input" type="text" placeholder="Поиск..." v-model="sortSearch">
+            <span :class="$style.sales_search__button" title="Поиск"></span>
+          </div>
+        </div>
       </div>
     </div>
-    <div><span @click="prevPage"> << </span>    <span @click="nextPage"> >> </span> </div>
+    <div :class="$style.revenue_component__pagination_nav">
+      <default-pagination v-model="pages" /> 
+    </div>
     <div :class="$style.revenue_component__items_list">
       <table :class="$style.items_list">
         <thead :class="$style.items_list__header">
           <tr :class="$style.items_list__row">
-            <th :class="$style.items_list__column">Дата</th>
-            <th :class="$style.items_list__column">Адрес</th>
-            <th :class="$style.items_list__column">Цена аренды</th>
-            <th :class="$style.items_list__column">Комиссия</th>
-            <th :class="$style.items_list__column">Контрагент</th>
-            <th :class="$style.items_list__column">Сотрудник</th>
+            <th :class="[ $style.items_list__column, sortType === 'created' && $style._active ]"
+              @click="onChangeSortField('created')">Дата</th>
+
+            <th :class="[ $style.items_list__column, sortType === 'street' && $style._active ]"
+              @click="onChangeSortField('street')">Адрес</th>
+
+            <th :class="[ $style.items_list__column, sortType === 'price' && $style._active ]"
+              @click="onChangeSortField('price')">Цена аренды</th>
+
+            <th :class="[ $style.items_list__column, sortType === 'commission' && $style._active ]"
+              @click="onChangeSortField('commission')">Комиссия</th>
+
+            <th :class="[ $style.items_list__column, sortType === 'partner' && $style._active ]"
+              @click="onChangeSortField('partner')">Контрагент</th>
+
+            <th :class="[ $style.items_list__column, sortType === 'employee' && $style._active ]"
+              @click="onChangeSortField('employee')">Сотрудник</th>
           </tr>
         </thead>
         <transition name="fade" appear>
           <tbody :class="$style.items_list__content">
-              <sales-row v-for="sale in salesByTimestamp" :sale="sale" :key="sale.key" @select="onSelect" />
+            <sales-row v-for="sale in paginatedItems" :sale="sale" :key="sale.key" @select="onSelect" />
           </tbody>
         </transition>
       </table>
+      <default-loader v-if="dataLoading" />
     </div>
   </div>
 </template>
@@ -96,9 +95,17 @@
       &:after { @include clearfix }
       padding: 10px 0;
     }
+
+    .revenue_component__pagination_nav {
+      position: relative;
+      text-align: right;
+    }
+
     .revenue_component__items_list {
       &:after { @include clearfix }
+      position: relative;
       padding: 10px 0;
+      min-height: 450px;
     }
   }
 
@@ -140,34 +147,6 @@
       margin-top: 1px;
     }
   }
-  
-  .table_period  {
-    &:after { @include clearfix }
-    .table_period__button {
-      display: block;
-      float: right;
-      padding: 4px 10px;
-      font-size: 13px;
-      line-height: 1.5;
-      border: 1px solid #2f353b;
-      cursor: pointer;
-      color: #2f353b;
-      background-color: #fff;
-      border-radius: 25px;
-      white-space: nowrap;
-      user-select: none;
-      margin-left: 10px;
-      width: 75px;
-      text-align: center;
-      transition: border-color .5s, background-color .15s, color .15s;
-      &:last-child { margin-left: 0 }
-      &:hover, &._active {
-        border-color: #2f353b;
-        color: #fff;
-        background-color: #2f353b;
-      }
-    }
-  }
 
   .list_actions {
     &:after { @include clearfix }
@@ -202,6 +181,38 @@
         border-color: #2499a3;
       }
     }
+    .list_actions__sales_search {
+      float: right;
+    }
+  }
+
+  .sales_search {
+    position: relative;
+    .sales_search__input {
+      border: 1px solid #94A0B2;
+      color: #94A0B2;
+      background-color: #fff;
+      font-size: 13px;
+      width: 176px;
+      font-weight: 300;
+      height: 34px;
+      padding: 6px 12px;
+      padding-right: 34px;
+      outline: none;
+      transition: width .4s;
+      &:focus { width: 280px }
+    }
+    .sales_search__button {
+      position: absolute;
+      right: 8.5px;
+      top: 8.5px;
+      width: 17px;
+      height: 17px;
+      background-image: url("../assets/icons/search.svg");
+      background-repeat: no-repeat;
+      background-size: 100%;
+      cursor: pointer;
+    }
   }
 
   .items_list {
@@ -214,6 +225,7 @@
     .items_list__row { /* */ }
     .items_list__column {
       &:first-child { border-left: 1px solid #e7ecf1 }
+      cursor: pointer;
       font-weight: 600;
       font-size: 14px;
       background-color: #eff3f8;
@@ -222,6 +234,8 @@
       padding: 10px 5px;
       text-align: center;
       vertical-align: middle;
+      user-select: none;
+      &:hover, &._active { color: #5C9BD1 }
     }
   }
 
@@ -229,60 +243,115 @@
 
 <script>
   import fireface from '../helpers/firebase-iface.js';
-  import hlp from '../helpers/helpers.js';
+  import h from '../helpers/helpers.js';
   import CreateSale from './revenue-component/create-sale.vue';
   import SalesRow from './revenue-component/sales-row.vue';
   import ModalOverlay from './modal-overlay/modal-overlay.vue';
+  import DefaultRadio from './default-radio/default-radio.vue';
+  import DefaultLoader from './default-loader/default-loader.vue';
+  import DefaultPagination from './default-pagination/default-pagination.vue';
 
   export default {
     name: 'revenue',
-    components: { CreateSale, SalesRow, ModalOverlay },
+
+    components: { CreateSale, SalesRow, ModalOverlay, DefaultRadio, DefaultLoader, DefaultPagination },
+
     data() {
       return {
+        pages: { current: 1, itemsPerPage: 10, itemsCount: 10 },
+        dataLoading: false,
+        sortSearch: '',
+        sortType: 'created',
+        sortDesc: false,
         editingSale: {},
         sales: {},
-        startAt: 'week',
-        endAt: new Date,
         showSaleCreateForm: false,
         showModal: false,
-        currentRef: ''
-      }
-    },
-    watch: {
-      startAt(value) {
-        this.onDateRangeChange();
-      },
-      endAt(value) {
-        this.onDateRangeChange();
+        currentRef: '',
+        startAtRange: {
+          current: 'week',
+          items: [
+            { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
+            { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
+            { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
+            { label: 'Год', title: 'В текущем году', value: 'year', isActive: false },
+            { label: 'Все', title: 'За все время', value: 'all', isActive: false }
+          ]
+        }
       }
     },
 
     mounted() {
-      this.onDateRangeChange();
+      this.dateRangeChange('week', new Date);
     },
 
     computed: {
-      salesByTimestamp: function() {
-        if ( hlp._isEmptyObject(this.sales) || !this.sales ) return false
+      paginatedItems() {
+        let salesCount = this.filteredItems.length;
+        if ( salesCount ) {
+          this.pages.itemsCount = salesCount;
+          let startAt = (this.pages.current - 1) * this.pages.itemsPerPage,
+              endAt = this.pages.current * this.pages.itemsPerPage
+          return this.filteredItems.slice(startAt, endAt);
+        }
+      },
+
+      filteredItems() {
+        if ( h._isEmptyObject(this.sales) || !this.sales ) return []
         else {
-          let arr = Object.keys(this.sales).map(key => this.sales[key] );
-          return arr.sort((x, y) => y.created - x.created);
+          let arr = h._objToArr(this.sales),
+              results = [];
+
+          if ( this.sortSearch ) {
+            let searchStr = this.sortSearch.toLowerCase();
+            arr.forEach( sale => {
+              let notRecurrence = true;
+              [ 'employee', 'partner', 'street' ].forEach( field => {
+                let current = sale[field].toLowerCase();
+                if ( current.indexOf(searchStr) !== -1 && notRecurrence) {
+                  results.push(sale);
+                  notRecurrence = false;
+                }
+              })
+            })
+            arr = results;
+          }
+          return arr.sort((a, b) => {
+            // TODO переписать эту содомию
+            if ( this.sortDesc ) {
+              if ( a[this.sortType] > b[this.sortType] ) return 1;
+              if ( a[this.sortType] < b[this.sortType] ) return -1;
+            } else {
+              if ( a[this.sortType] < b[this.sortType] ) return 1;
+              if ( a[this.sortType] > b[this.sortType] ) return -1;
+            }
+          });
+
         }
       }
     },
     methods: {
-      nextPage() {
-        let arr = hlp._objToArr(this.sales),
-            endAt = Math.min.apply(Math, arr.map( (obj) => obj.created ));
-        console.log(endAt);
-        this.endAt = endAt;
+      onPageSelect(page) {
+        if ( page.current === '<' ) {
+
+        } else if (  page.current === '>' ) {
+
+        } else {
+          
+        }
       },
 
-      prevPage() {
-        let arr = hlp._objToArr(this.sales),
-            endAt = Math.max.apply(Math, arr.map( (obj) => obj.created ));
-        console.log(endAt);
-        this.endAt = endAt;
+      onChangeSortField(field) {
+        if ( this.sortType === field ) {
+          this.sortDesc = !this.sortDesc;
+        } else {
+          this.sortDesc = false;
+          this.sortType = field;
+        }
+        
+      },
+      onSelectRange(startAt) {
+        this.dateRangeChange(startAt.current, new Date)
       },
 
       onSelect(object) {
@@ -299,8 +368,10 @@
         this.showModal = false;
       },
 
-      onDateRangeChange() {
-        let range = { startAt: this.startAt, endAt: this.endAt };
+      dateRangeChange(startAt, endAt) {
+        this.pages.current = 1;
+        this.dataLoading = true;
+        let range = { startAt: startAt, endAt: endAt };
         if ( this.currentRef ) {
           this.currentRef.off( 'value', this.firebaseValueCallback );
         }
@@ -310,6 +381,7 @@
 
       firebaseValueCallback(sales) {
         this.sales = sales.val();
+        this.dataLoading = false;
       }
     }
   }

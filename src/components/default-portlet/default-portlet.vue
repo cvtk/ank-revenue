@@ -4,13 +4,7 @@
       <div :class="$style.header">
         <h2 :class="$style.header__title">{{ label }}</h2>
         <div :class="$style.header__controls">
-          <div :class="$style.controls">
-            <span v-for="( control, index ) in localControls" @click="onClick(index)"
-              :class="[ $style.controls__button, control.isActive && $style._active ]" 
-              :title="control.title">
-              {{ control.label }}
-            </span>
-          </div>
+          <default-radio :value="value" @input="onSelect" />
         </div>
       </div>
     </div>
@@ -48,13 +42,13 @@
 
   .header__controls {
     float: right;
-    padding: 6px 0 14px;
   }
 
   .controls {
     position: relative;
     display: inline-block;
     vertical-align: middle;
+    padding: 6px 0 14px;
   }
 
   .controls__button {
@@ -85,25 +79,19 @@
 </style>
 
 <script>
+  import DefaultRadio from '../default-radio/default-radio.vue';
+
   export default {
     name: 'default-portlet',
     props: {
       label: { default: 'Title', type: String },
-      value: {
-        default() { return [ { label: 'label', title: 'title', value: false, isActive: true } ] },
-        type: Array
-      }
+      value: { type: Object }
     },
-    data() {
-      return {
-        localControls : this.value
-      }
-    },
+    components: { DefaultRadio },
+
     methods: {
-      onClick(index) {
-        this.localControls.forEach( control => control.isActive = false );
-        this.localControls[index].isActive = true;
-        this.$emit('input', this.localControls);
+      onSelect(value) {
+        this.$emit('input', value);
       }
     }
   }

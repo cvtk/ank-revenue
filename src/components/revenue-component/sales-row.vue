@@ -1,16 +1,12 @@
 <template>
-  <tr :class="$style.sales_row" v-if="dataLoaded" @click="onClick">
+  <tr :class="$style.sales_row" @click="onClick">
     <td :class="$style.sales_row__column">{{ sale.created | _unixToHumanDate }}</td>
-    <td :class="$style.sales_row__column">
-      {{ sale.city.typeShort }}. {{ sale.city.name }},
-      {{ sale.city.typeShort }}. {{ sale.street.name }},
-      {{ sale.building.typeShort }}. {{ sale.building.name }}</td>
+    <td :class="$style.sales_row__column">{{ sale.city }}, {{ sale.street }}, {{ sale.building }}, кв. {{ sale.room }}</td>
     <td :class="$style.sales_row__column">{{ sale.price | _priceFormat }}<span :class="$style.ruble_icon"></span></td>
     <td :class="$style.sales_row__column">{{ sale.commission | _priceFormat }}<span :class="$style.ruble_icon"></span></td>
     <td :class="$style.sales_row__column">{{ sale.partner }}</td>
     <td :class="$style.sales_row__column">{{ sale.employee }}</td>
   </tr>
-  <tr :class="$style.sales_row" v-else><td :class="$style.sales_row__column">Записей не найдено</td></tr>
 </template>
 
 <style lang="scss" module>
@@ -44,21 +40,13 @@
 </style>
 
 <script>
-  import hlp from '../../helpers/helpers.js';
+  import h from '../../helpers/helpers.js';
   
 
   export default {
     name: 'sales-row',
     props: ['sale'],
-    filters: hlp,
-    computed: {
-      dataLoaded() {
-        return !hlp._isEmptyObject(this.sale);
-      }
-    },
-    data() {
-      return {}
-    },
+    filters: h,
     methods: {
       onClick() {
         this.$emit('select', this.sale);
