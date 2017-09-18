@@ -1,14 +1,20 @@
 <template>
   <div :class="$style.employee">
-    <default-field :value="value" type="text"
-      ref="input"
-      :label="label"
-      :isDone="isDone"
-      :needAttention="needAttention"
-    />
-    <div :class="$style.employee__create">
-      <employee-create />
+    <div :class="$style.employee__select">
+      <default-select :options="employees" name-field="name" @change="onEmployeeSelect"
+        :label="label"
+        :isDone="isDone"
+        :needAttention="needAttention"
+      />
+      <div :class="$style.employee__button">
+        <default-button @click.native="showMenu = !showMenu" icon="plus" :red="!isDone" title="Добавить сотрудника" />
+      </div>
     </div>
+    <modal-overlay :show="showMenu" @close="showMenu = false">
+      <div :class="$style.employee__edit">
+        <employee-create />
+      </div>
+    </modal-overlay>    
   </div>
 </template>
 
@@ -17,23 +23,34 @@
     position: relative;
   }
 
-  .employee__create {
+  .employee__select {
+    margin-right: 33px;
+  }
+
+  .employee__button {
+    position: absolute;
+    top: 12px;
+    right: 0;
+  }
+  .employee__edit {
     position: relative;
-    top: -1px;
   }
 </style>
 
 <script>
   import fireface from '../../helpers/firebase-iface.js';
-  import DefaultField from '../default-field/default-field.vue';
+  import DefaultSelect from '../default-select/default-select.vue';
+  import DefaultButton from '../default-button/default-button.vue';
+  import ModalOverlay from '../modal-overlay/modal-overlay.vue'  
   import EmployeeCreate from './employee-create.vue';
 
   export default {
     name: 'employee-field',
-    components: { DefaultField, EmployeeCreate },
+    components: { DefaultSelect, DefaultButton, EmployeeCreate, ModalOverlay },
     props: ['value', 'needAttention', 'isDone', 'label'],
     data() {
       return {
+        showMenu: false,
         local: this.value,
         employees: [],
         ref: null
@@ -44,16 +61,21 @@
       this.ref.on('value', this.onRetrieve);
     },
     methods: {
+      onEmployeeSelect(employeeIndex) {
+        this.$emit('input', this.employees[employeeIndex]);
+      },
       onRetrieve(employees) {
         let tmp = [];
         employees.forEach( employee => {
-          tmp.push( employee.val() );
+          let obj = employee.val(),
+              name = [obj.lastName, obj.firstName].join(' ');
+
+          tmp.push( { name: name, key: obj.key } );
         });
         this.employees = tmp.sort( (a, b) => {
           if ( a.lastName > b.lastName ) return 1;
           if ( a.lastName < b.lastName ) return -1;
         });
-        
       }
     }
   }

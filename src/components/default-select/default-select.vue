@@ -8,7 +8,7 @@
 
     <select :class="$style.select__input" :id="id" @change="onChange">
       <option  disabled selected> Выбрать значение </option>
-      <option  v-for="(option, index) in options" :value="index"> {{ option.name }} </option>
+      <option  v-for="(option, index) in options" :value="index"> {{ option[nameField] }} </option>
     </select>
     
     </div>
@@ -82,7 +82,7 @@
 
   export default {
     name: 'default-select',
-    props: ['label', 'isDone', 'needAttention', 'options' ],
+    props: ['label', 'isDone', 'needAttention', 'options', 'nameField' ],
     data() {
       return {
         id: Math.random().toString(36).substring(7)

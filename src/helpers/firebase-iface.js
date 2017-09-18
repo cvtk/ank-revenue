@@ -1,3 +1,4 @@
+import Firebase from 'firebase'
 import firebase from '../firebase.js';
 
 const revenueRef = firebase.database().ref('revenue');
@@ -70,6 +71,14 @@ export default {
   employees: {
     get: function() {
       return employeesRef;
+    },
+    save: function(employee) {
+      employee.created = Firebase.database.ServerValue.TIMESTAMP;
+      employee.key = employeesRef.push().key;
+      return employeesRef.child(employee.key).update(employee);
+    },
+    remove: function(key) {
+      return employeesRef.child(key).remove();
     }
   },
   revenue: {
