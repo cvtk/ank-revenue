@@ -5,7 +5,7 @@
       <div :class="$style.results">
         <div :class="$style.results__item">
           <div :class="$style.item">
-            <div :class="$style.item__title">Общая</div>
+            <div :class="$style.item__title">Общая сумма</div>
             <div :class="$style.item__value_total">{{ results.total | _priceFormat }}<span :class="$style.ruble"></span></div>
           </div>
         </div>
@@ -42,6 +42,7 @@
           </tr>
         </tbody>
       </table>
+      <div :class="$style.body__no_results" v-if="employeesPages === 0"> {{ getEmptyMessage() }} </div>
     </div>
     <div :class="$style.top__pagination">
       <default-pagination small v-model="pages" /> 
@@ -54,7 +55,6 @@
 
   .top {
     position: relative;
-    padding: 12px 20px;
   }
   .top__results {
     position: relative;
@@ -76,24 +76,28 @@
     padding-right: 15px;
   }
 
-  .item {}
+  .item { position: relative }
 
   .item__title {
     color: #525e64;
     font-size: 13px;
+    text-align: center;
   }
 
   .item__value_total {
     color: #EF4836;
     font-size: 22px;
+    text-align: center;
   }
   .item__value_group_1 {
     color: #32c5d2;
     font-size: 22px;
+    text-align: center;
   }
   .item__value_group_2 {
     color: #8E44AD;
     font-size: 22px;
+    text-align: center;
   }
 
   .top__employees { height: 280px }
@@ -122,6 +126,7 @@
     }
   }
   .employees__body {
+    tr:nth-child(odd) { background-color: rgba(92, 155, 209, 0.1) }
     td {
       border-bottom: 1px solid #F2F5F8;
       color: #8896a0;
@@ -132,6 +137,15 @@
     }
   }
 
+  .body__no_results {
+    border-bottom: 1px solid #F2F5F8;
+    color: #8896a0;
+    padding: 6px;
+    font-size: 14px;
+    font-weight: 300;
+    text-align: center;
+  }
+  
   ._strong { font-weight: 600 !important }
 
   .top__pagination { text-align: right }
@@ -183,7 +197,7 @@
           let startAt = (this.pages.current - 1) * this.pages.itemsPerPage,
               endAt = this.pages.current * this.pages.itemsPerPage
           return this.employees.slice(startAt, endAt);
-        }
+        } else return 0;
       }
     },
     watch: {
@@ -192,6 +206,14 @@
       }
     },
     methods: {
+      getEmptyMessage() {
+        switch(this.startAt) {
+          case 'week': return 'На этой неделе продаж не было';
+          case 'month': return 'В этом месяце продаж не было';
+          case 'quarter': return 'В этом квартале продаж не было';
+          case 'year': return 'В этом году продаж не было';
+        }
+      },
       groupBy(arr, key) {
         return arr.reduce(function(rv, x) {
           (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -212,7 +234,7 @@
       salesCallback(sales) {
         let arrByEmployee = this.groupBy( h._objToArr(sales.val()), 'employee'),
             arrBySum = [];
-        this.results = { total: null, group_1: null, group_2: null };
+        this.results = { total: 0, group_1: 0, group_2: 0 };
 
         for ( let key in arrByEmployee ) {
 

@@ -1,6 +1,8 @@
 import firebase from '../firebase.js';
 
 const revenueRef = firebase.database().ref('revenue');
+const groupsRef = firebase.database().ref('groups');
+const employeesRef = firebase.database().ref('employees');
 const moment = require('moment');
 const model = {
   created: 'date',
@@ -60,6 +62,16 @@ function _validate(value, type) {
 }
 
 export default {
+  groups: {
+    get: function() {
+      return groupsRef;
+    }
+  },
+  employees: {
+    get: function() {
+      return employeesRef;
+    }
+  },
   revenue: {
     check: function(object) {
       let log = [];

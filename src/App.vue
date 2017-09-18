@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.app">
-    <login :isAuth="isAuth" />
+    <default-loader v-if="dataLoading" />
     <div :class="$style.app__page_header">
       <div :class="$style.page_header">
         <div :class="$style.page_header__company_logo">
@@ -34,9 +34,6 @@
             </li>
             <li :class="$style.app_navigation__item">
               <router-link :to="{ name: 'revenue' }" :class="$style.app_navigation__link" :active-class="$style._active" exact>Продажи</router-link>
-            </li>
-            <li :class="$style.app_navigation__item">
-              <router-link :to="{ name: 'reports' }" :class="$style.app_navigation__link" :active-class="$style._active" exact>Отчеты</router-link>
             </li>
           </ul>
         </div>
@@ -142,12 +139,13 @@
 <script>
   import firebase from './firebase.js';
   import hlp from './helpers/helpers.js';
-  import Login from './components/Login.vue';
+  import DefaultLoader from './components/default-loader/default-loader.vue';
+
   export default {
     name: 'app',
-    components: { Login },
+    components: { DefaultLoader },
     data() {
-      return { auth: {}, isAuth: false }
+      return { auth: {}, isAuth: true, dataLoading: true }
     },
     methods: {
       appLogout() {
@@ -155,10 +153,33 @@
       }
     },
     beforeCreate() {
+      this.dataLoading = true
+
+      this.$router.beforeEach((to, from, next) => {
+        if (to.matched.some(record => record.meta.requiresAuth)) {
+          if (!this.isAuth) {
+            next({
+              path: '/login',
+              query: { redirect: to.fullPath }
+            })
+          } else {
+            next()
+          }
+        } else {
+          next()
+        }
+      });
+
       firebase.auth().onAuthStateChanged( (auth)=> {
         this.auth = auth;
         if ( this.auth === null ) this.isAuth = false
         else this.isAuth = true;
+        this.dataLoading = false;
+        
+        if (!auth && this.$route.name !== 'login') {
+          this.$router.push({ name: 'login', query: { redirect: this.$route.path} })
+        }
+        
       });
     },
   }

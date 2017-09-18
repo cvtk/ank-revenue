@@ -121,7 +121,7 @@
       margin-bottom: 4px
     }
 
-    .tool_bar__table_period { float: right }
+    .tool_bar__table_period { float: right; margin: 2px 0 }
   }
   
   .table_caption {
@@ -369,6 +369,7 @@
       },
 
       dateRangeChange(startAt, endAt) {
+        this.pages.itemsCount = 0;
         this.pages.current = 1;
         this.dataLoading = true;
         let range = { startAt: startAt, endAt: endAt };

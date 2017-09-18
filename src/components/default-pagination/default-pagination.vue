@@ -78,7 +78,7 @@
           return {
             current: 1,
             itemsPerPage: 10,
-            itemsCount: 10
+            itemsCount: 0
           }
         },
         type: Object

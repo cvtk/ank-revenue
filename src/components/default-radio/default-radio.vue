@@ -13,12 +13,12 @@
     position: relative;
     display: inline-block;
     vertical-align: middle;
-    padding: 6px 0 14px;
     &._small {
       .radio__button {
+        font-family: "Arial", sans-serif;
         font-weight: 300;
-        font-style: 12px;
-        padding: 3.5px 6px;
+        font-size: 12px;
+        padding: 4px 7px;
         line-height: 1;
         border: none;
       }

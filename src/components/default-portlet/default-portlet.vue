@@ -17,10 +17,13 @@
 
   .portlet {
     background-color: #fff;
+    padding: 12px 20px;
+    height: 475px;
   }
   
   .portlet__header {
-    padding: 12px 20px;
+    padding-bottom: 20px;
+    
   }
 
   .header {
@@ -42,6 +45,7 @@
 
   .header__controls {
     float: right;
+    margin: 5px 0;
   }
 
   .controls {

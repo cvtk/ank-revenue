@@ -108,7 +108,11 @@
       login() {
         if ( this.emailValidate && this.passwordValidate ) {
           firebase.auth().signInWithEmailAndPassword(this.email, this.password)
-            .then( () => Object.assign( this.$data, init() ) )
+            .then( () => {
+              Object.assign( this.$data, init() );
+              setTimeout( () => this.$router.push(this.$route.query.redirect), 500);
+              
+            })
             .catch( (error) => this.err = error )
         }
       },
