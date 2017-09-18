@@ -40,6 +40,15 @@
       width: 12px;
       height: 12px;
     }
+    &._icon_trash:after {
+      content: "";
+      display: inline-block;
+      background-image: url("../../assets/icons/tresh.svg");
+      background-repeat: no-repeat;
+      background-size: 100%;
+      width: 12px;
+      height: 12px;
+    }
   }
 
 </style>

@@ -6,18 +6,26 @@
         <div :class="$style._wrapper">
           <div :class="$style.create__item">
             <default-field v-model="firstName" type="text"
+              @keyup.enter="onSave"
               label="Имя"
               :isDone="validateName"
             />
           </div>
           <div :class="$style.create__item">
             <default-field v-model="lastName" type="text"
+              @keyup.enter="onSave"
               label="Фамилия"
               :isDone="validateSurname"
             />
           </div>
           <div :class="$style.create__item">
-            <default-select :options="groups" label="Группа" name-field="name" @change="onGroupSelect" :isDone="group && groupId" />
+            <default-select :options="groups" 
+              label="Группа"
+              name-field="name"
+              @change="onGroupSelect"
+              @keyup.enter="onSave"
+              :isDone="group && groupId"
+            />
           </div>
         </div>
         <div :class="$style.create__save">
@@ -26,14 +34,12 @@
       </div>
     </div>
     <div :class="$style.devider"></div>
-    <h5 :class="$style.crud__title">Удалить сотрудника</h5>
     <div :class="$style.crud__edit">
       <div :class="$style.edit">
         <div :class="$style.edit__employees">
           <table :class="$style.employees">
             <thead :class="$style.employees__head">
               <tr>
-                <th>№</th>
                 <th>Имя</th>
                 <th>Фамилия</th>
                 <th>Группа</th>
@@ -42,12 +48,11 @@
             </thead>
             <tbody :class="$style.employees__body">
               <tr v-for="employee in employeesPages">
-                <td>{{ employee.index }}</td>
                 <td>{{ employee.firstName }}</td>
                 <td>{{ employee.lastName }}</td>
                 <td>{{ employee.group }}</td>
                 <td>{{ employee.created }}</td>
-                <td> <default-button label="x" :red="true" @click.native="onRemove(employee.key)" title="Удалить сотрудника" /> </td>
+                <td> <default-button icon="trash" :red="true" @click.native="onRemove(employee.key)" title="Удалить сотрудника" /> </td>
               </tr>
             </tbody>
           </table>
@@ -138,7 +143,10 @@
     }
   }
   .employees__body {
-    tr:nth-child(odd) { background-color: rgba(92, 155, 209, 0.1) }
+    tr {
+      cursor: pointer;
+      &:hover { background-color: rgba(92, 155, 209, 0.2) }
+    }
     td {
       border-bottom: 1px solid #F2F5F8;
       color: #8896a0;
@@ -146,6 +154,7 @@
       padding: 6px;
       font-size: 14px;
       font-weight: 300;
+      &:last-child { text-align: right }
     }
   }
 
@@ -177,7 +186,6 @@
       return {
         firstName: '', lastName: '', groupId: '', group: '',
         groups: [], employees: [],
-        dataLoading: true,
         pages: {
           current: 1,
           itemsPerPage: 5,
@@ -188,18 +196,16 @@
     created() {
 
       fireface.employees.get().on('value', employees => {
-        let tmp = [],
-            index = 1;
+        let tmp = [];
 
         employees.forEach( employee => {
           let obj = employee.val();
 
           obj.created = h._moment(obj.created).format('DD.MM.YY');
-          obj.index = index++;
           tmp.push( obj )
         });
 
-        this.employees = tmp;
+        this.employees = tmp.reverse();
         this.pages.itemsCount = this.employees.length;
       });
 
@@ -244,6 +250,12 @@
           lastName: this.lastName,
           groupId: this.groupId,
           group: this.group
+        })
+        .then(function() {
+          
+        })
+        .catch(function(error) {
+          console.log("Save failed: " + error.message)
         });
       },
       onGroupSelect(groupIndex) {
