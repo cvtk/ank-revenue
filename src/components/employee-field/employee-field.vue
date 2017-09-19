@@ -70,7 +70,7 @@
           let obj = employee.val(),
               name = [obj.lastName, obj.firstName].join(' ');
 
-          tmp.push( { name: name, key: obj.key } );
+          tmp.push( { name: name, key: obj.key, group: obj.group, groupId: obj.groupId } );
         });
         this.employees = tmp.sort( (a, b) => {
           if ( a.lastName > b.lastName ) return 1;

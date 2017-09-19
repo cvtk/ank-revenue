@@ -59,7 +59,7 @@
       <div :class="$style.deal">
         <h2 :class="$style.header">Параметры сделки</h2>
         <div :class="$style.deal__employee">
-          <default-field label="Сотрудник"
+          <employee-field label="Сотрудник"
             v-model="newSale.employee"
             type="text"
             :isDone="newSale.employee"
@@ -390,7 +390,48 @@
 
       onSave(event) {
         if ( this.currentField === 'complete' ) {
-          fireface.revenue.save(this.newSale)
+          let sale = {};
+
+          ['city', 'street', 'building'].forEach( field => {
+            let obj = this.newSale[field],
+                str = [ obj.typeShort, obj.name ].join('. ');
+            sale[field] = str;
+          });
+
+          ['price', 'room', 'communal_included'].forEach( field => 
+            sale[field] = this.newSale[field]
+          );
+
+          sale.created = parseInt((new Date(this.newSale.created).getTime() / 1000).toFixed(0));
+
+          sale.employee = this.newSale.employee.name;
+          sale.employeeId = this.newSale.employee.key;
+          sale.group = this.newSale.employee.group;
+          sale.groupId = this.newSale.employee.groupId;
+          sale.type = this.newSale.type.current;
+          sale.partner = this.newSale.partner.name;
+          sale.partnerId = this.newSale.partner.key;
+          sale.partnerGroup = this.newSale.partner.group;
+          sale.partnerGroupId = this.newSale.partner.groupId;
+
+          if ( sale.type === 'self' ) {
+            sale.commission = this.newSale.commission;
+          } else if ( sale.type === 'employee' ) {
+              sale.commission = Math.round(this.newSale.commission / 2)
+              let partnerSale = hlp._objClone(sale);
+              partnerSale.employee = sale.partner;
+              partnerSale.employeeId = sale.partnerId;
+              partnerSale.group = sale.partnerGroup;
+              partnerSale.groupId = sale.partnerGroupId;
+              partnerSale.partner = sale.employee;
+              partnerSale.partnerId = sale.employeeId;
+              partnerSale.partnerGroup = sale.group;
+              partnerSale.partnerGroupId = sale.groupId;
+              fireface.revenue.save(partnerSale);
+          } else if ( sale.type === 'partner' ) {
+              sale.commission = Math.round(this.newSale.commission / 2);
+          }
+          fireface.revenue.save(sale)
             .then( ()=> this.$emit('save') )
         }
       },

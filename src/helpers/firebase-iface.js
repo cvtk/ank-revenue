@@ -95,24 +95,12 @@ export default {
       return ( log.length > 0 )? log: true;
     },
 
-    save: function(data) {
-      let sale = {}, checkResult = this.check(data);
-      if ( checkResult === true ) {
-        _each( data, (value, key) => {
-          let tmp = {};
-          if ( key in model ) {
-            if ( model[key] === 'int' ) sale[key] = parseInt(value, 10)
-            else if ( model[key] === 'bool' ) sale[key] = _toBool(value)
-            else if ( model[key] === 'date' ) sale[key] = _toUnix(value)
-            else sale[key] = value;
-          }
-        })
-        if ( !sale.key ) {
-          sale.key = revenueRef.push().key;
-        }
-        return revenueRef.child(sale.key).update(sale);
- 
-      } else return checkResult;
+    save: function(sale) {
+      console.log(sale);
+      if ( !sale.key ) {
+        sale.key = revenueRef.push().key;
+      }
+      return revenueRef.child(sale.key).update(sale);
     },
 
     byCreated: function(range, onPage = 10) {
