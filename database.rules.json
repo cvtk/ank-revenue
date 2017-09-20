@@ -1,11 +1,6 @@
 {
   "rules": {
     ".read": "auth != null",
-    ".write": "auth != null",
-    "revenue": {
-      ".indexOn": [
-        "created"
-      ]
-    }
+    ".write": "auth != null"
   }
 }
