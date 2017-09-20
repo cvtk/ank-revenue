@@ -58,6 +58,9 @@
   
   .app {
     height: 100%;
+    @media (max-width: 600px) {
+      .employee_profile__name { display: none }
+    }
   }
 
   .app__page_header { /* */ }

@@ -70,11 +70,11 @@
           <div :class="$style.type">
             <span :class="$style.type__label">Тип сделки:</span>
             <div :class="$style.type__controls">
-              <default-radio v-model="newSale.type" small @input="newSale.partner.name = ''"/>
+              <default-radio :value="type" small @input="onTypeChange"/>
             </div>
           </div>
         </div>
-        <div :class="$style.deal__partner" v-if="newSale.type.current === 'partner'">
+        <div :class="$style.deal__partner" v-if="newSale.type === 'partner'">
           <default-field label="Контрагент"
             v-model="newSale.partner.name"
             type="text"
@@ -82,7 +82,7 @@
             :needAttention="currentField === 'partner'"
           />
         </div>
-        <div :class="$style.deal__partner" v-if="newSale.type.current === 'employee'">
+        <div :class="$style.deal__partner" v-if="newSale.type === 'employee'">
           <employee-field label="Коллега"
             v-model="newSale.partner"
             type="text"
@@ -326,18 +326,18 @@
     data() {
       return {
         city: 'Ярославль', street: '', building: '',
+        type: {
+          current: 'self',
+          items: [
+            { label: 'личная', title: 'Личная продажа - 100%', value: 'self', isActive: true },
+            { label: 'коллега', title: 'Совместная с коллегой - 50/50%', value: 'employee', isActive: false },
+            { label: 'партнер', title: 'Совместная с партнером - 50%', value: 'partner', isActive: false }
+          ]
+        },
         newSale: {
-          type: {
-            current: 'self',
-            items: [
-              { label: 'личная', title: 'Личная продажа - 100%', value: 'self', isActive: true },
-              { label: 'коллега', title: 'Совместная с коллегой - 50/50%', value: 'employee', isActive: false },
-              { label: 'партнер', title: 'Совместная с партнером - 50%', value: 'partner', isActive: false }
-            ]
-          },
+          type: 'self',
           created: new Date(),
           key: '',
-          modified: '',
           price: '',
           communal_included: false,
           commission: '',
@@ -352,18 +352,11 @@
     },
     created() {
       if ( typeof this.sale !== 'undefined' ) {
+        this.type.current = this.sale.type;
         this.city = this.sale.city.name;
         this.street = this.sale.street.name;
         this.building = this.sale.building.name;
         this.sale.created = new Date(this.sale.created * 1000);
-        this.sale.type = {
-            current: this.sale.type,
-            items: [
-              { label: 'личная', title: 'Личная продажа - 100%', value: 'self', isActive: true },
-              { label: 'коллега', title: 'Совместная с коллегой - 50/50%', value: 'employee', isActive: false },
-              { label: 'партнер', title: 'Совместная с партнером - 50%', value: 'partner', isActive: false }
-            ]
-          },
         this.newSale = this.sale;
       }
     },
@@ -374,14 +367,19 @@
         if ( hlp._isEmptyObject(this.newSale.building) || this.building !== this.newSale.building.name ) return 'building';
         if ( this.newSale.room === '' ) return 'room';
         if ( this.newSale.created === '' ) return 'created';
-        if ( this.newSale.employee === '' ) return 'employee';
-        if ( this.newSale.type.current !== 'self' && this.newSale.partner === '' ) return 'partner';
+        if ( this.newSale.employee.name === '' ) return 'employee';
+        if ( this.newSale.type !== 'self' && this.newSale.partner.name === '' ) return 'partner';
         if ( this.newSale.price === '' ) return 'price';
         if ( this.newSale.commission === '' ) return 'commission';
         return 'complete';
       }
     },
     methods: {
+      onTypeChange(obj) {
+        this.newSale.partner.name = '';
+        this.newSale.type = obj.current;
+
+      },
       onRemove(event) {
         fireface.revenue.remove(this.newSale.key)
           .then( () => console.log('Remove item'))
@@ -393,7 +391,6 @@
       onSave(event) {
         if ( this.currentField === 'complete' ) {
           let sale = Object.assign( {}, this.newSale );
-          sale.type = sale.type.current;
           sale.created = hlp._dateToUnix(sale.created);
           sale.commission = ( sale.type !== 'self' && !sale.key ) ? Math.round(sale.commission / 2) : sale.commission;
 

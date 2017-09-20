@@ -1,7 +1,7 @@
 <template>
   <div :class="[ $style.radio, small && $style._small ]">
     <span v-for="( radio, index ) in local.items" @click="onClick(index)"
-      :class="[ $style.radio__button, radio.isActive && $style._active ]" 
+      :class="[ $style.radio__button, index === current && $style._active ]" 
       :title="radio.title">
       {{ radio.label }}
     </span>
@@ -70,7 +70,7 @@
     },
     created() {
       this.local.items.forEach( (radio, index) => {
-        if ( radio.isActive === true ) this.current = index;
+        if ( radio.value === this.local.current ) this.current = index;
       });
     },
     methods: {
