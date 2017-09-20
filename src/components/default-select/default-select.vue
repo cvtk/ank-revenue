@@ -6,8 +6,7 @@
       {{ label }}
     </label>
 
-    <select :class="$style.select__input" :id="id" @change="onChange">
-      <option  disabled selected> Выбрать значение </option>
+    <select :class="$style.select__input" :id="id" @change="onChange" ref="select">
       <option  v-for="(option, index) in options" :value="index"> {{ option[nameField] }} </option>
     </select>
     
@@ -82,14 +81,23 @@
 
   export default {
     name: 'default-select',
-    props: ['label', 'isDone', 'needAttention', 'options', 'nameField' ],
+    props: ['label', 'isDone', 'needAttention', 'options', 'nameField', 'defaultValue' ],
     data() {
       return {
         id: Math.random().toString(36).substring(7)
       }
     },
+    mounted() {
+      let defaultValue = this.options.reduce( (res, item, i, arr) => {
+        if ( item.name === this.defaultValue ) res = i;
+        return res;
+      }, 0);
+      this.$refs.select.value = defaultValue;
+    },
     methods: {
-      onChange(event) { this.$emit('change', event.target.value ) }
+      onChange(event) {
+        this.$emit('change', event.target.value );
+      }
     }
   }
 </script>

@@ -2,6 +2,7 @@
   <div :class="$style.employee">
     <div :class="$style.employee__select">
       <default-select :options="employees" name-field="name" @change="onEmployeeSelect"
+        :defaultValue="local.name"
         :label="label"
         :isDone="isDone"
         :needAttention="needAttention"

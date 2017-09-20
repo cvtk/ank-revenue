@@ -1,11 +1,20 @@
 <template>
   <tr :class="$style.sales_row" @click="onClick">
     <td :class="$style.sales_row__column">{{ sale.created | _unixToHumanDate }}</td>
-    <td :class="$style.sales_row__column">{{ sale.city }}, {{ sale.street }}, {{ sale.building }}, кв. {{ sale.room }}</td>
-    <td :class="$style.sales_row__column">{{ sale.price | _priceFormat }}<span :class="$style.ruble_icon"></span></td>
+    <td :class="$style.sales_row__column">
+      {{ sale.city.typeShort }}. {{ sale.city.name }},
+      {{ sale.street.typeShort }}. {{ sale.street.name }},
+      {{ sale.building.typeShort }}. {{ sale.building.name }},
+      кв. {{ sale.room }}
+    </td>
+    <td :class="$style.sales_row__column">
+      {{ sale.price | _priceFormat }}<span :class="$style.ruble_icon"></span>
+      <span :class="[ $style.included, sale.communal_included && $style._visible ]" title="Коммунальные включены"></span>
+    </td>
     <td :class="$style.sales_row__column">{{ sale.commission | _priceFormat }}<span :class="$style.ruble_icon"></span></td>
-    <td :class="$style.sales_row__column">{{ sale.partner }}</td>
-    <td :class="$style.sales_row__column">{{ sale.employee }}</td>
+    <td :class="$style.sales_row__column">{{ sale.type | _saleType }}</td>
+    <td :class="$style.sales_row__column">{{ sale.partner.name }}</td>
+    <td :class="$style.sales_row__column">{{ sale.employee.name }}</td>
   </tr>
 </template>
 
@@ -23,7 +32,7 @@
   .sales_row {
     &:hover { background-color: #e7ecf1; }
   }
-
+  
   .sales_row__column {
     &:first-child { border-left: 1px solid #e7ecf1 }
     cursor: pointer;
@@ -35,6 +44,18 @@
     vertical-align: middle;
     font-weight: 300;
     font-size: 13px;
+  }
+
+  .included {
+    visibility: hidden;
+    display: inline-block;
+    background-image: url("../../assets/icons/include.svg");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    height: 15px;
+    width: 15px;
+    vertical-align: bottom;
+    &._visible { visibility: visible }
   }
 
 </style>

@@ -52,6 +52,9 @@
             <th :class="[ $style.items_list__column, sortType === 'commission' && $style._active ]"
               @click="onChangeSortField('commission')">Комиссия</th>
 
+            <th :class="[ $style.items_list__column, sortType === 'type' && $style._active ]"
+              @click="onChangeSortField('type')">Тип сделки</th>
+
             <th :class="[ $style.items_list__column, sortType === 'partner' && $style._active ]"
               @click="onChangeSortField('partner')">Контрагент</th>
 
@@ -302,28 +305,37 @@
           let arr = h._objToArr(this.sales),
               results = [];
 
-          if ( this.sortSearch ) {
+          if ( this.sortSearch.trim() ) {
             let searchStr = this.sortSearch.toLowerCase();
             arr.forEach( sale => {
               let notRecurrence = true;
               [ 'employee', 'partner', 'street' ].forEach( field => {
-                let current = sale[field].toLowerCase();
-                if ( current.indexOf(searchStr) !== -1 && notRecurrence) {
-                  results.push(sale);
-                  notRecurrence = false;
+                if ( !!sale[field].name ) {
+                  let current = sale[field].name.toLowerCase();
+                  if ( current.indexOf(searchStr) !== -1 && notRecurrence) {
+                    results.push(sale);
+                    notRecurrence = false;
+                  }
                 }
               })
             })
             arr = results;
           }
-          return arr.sort((a, b) => {
+          return arr.sort((fElement, sElement) => {
             // TODO переписать эту содомию
+            let st = this.sortType, a, b = '';
+            if ( st === 'street' || st === 'employee' || st === 'partner' ) {
+              a = fElement[st].name; b = sElement[st].name;
+            }
+            else {
+              a = fElement[st]; b = sElement[st];
+            }
             if ( this.sortDesc ) {
-              if ( a[this.sortType] > b[this.sortType] ) return 1;
-              if ( a[this.sortType] < b[this.sortType] ) return -1;
+              if ( a > b ) return 1;
+              if ( a < b ) return -1;
             } else {
-              if ( a[this.sortType] < b[this.sortType] ) return 1;
-              if ( a[this.sortType] > b[this.sortType] ) return -1;
+              if ( a < b ) return 1;
+              if ( a > b ) return -1;
             }
           });
 
@@ -377,10 +389,10 @@
           this.currentRef.off( 'value', this.firebaseValueCallback );
         }
         this.currentRef = fireface.revenue.byCreated( range, 10 );
-        this.currentRef.on( 'value', this.firebaseValueCallback );
+        this.currentRef.on( 'value', this.onValue );
       },
 
-      firebaseValueCallback(sales) {
+      onValue(sales) {
         this.sales = sales.val();
         this.dataLoading = false;
       }

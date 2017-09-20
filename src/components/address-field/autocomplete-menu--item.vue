@@ -1,12 +1,7 @@
 <template>
     <li :class="[ $style.item, isActive && $style._active ]" @click="onSelect">
       {{ item.typeShort }}. {{ item.name }}
-      <span v-if="contentType === 'city'" :class="$style._lighten" v-for="parent in item.parents">
-        {{ parent.name }} {{ parent.typeShort }}
-      </span>
-      <span v-if="contentType !== 'city'" :class="$style._lighten">
-        {{ item.parents[item.parents.length - 1].typeShort }}. {{ item.parents[item.parents.length - 1].name }}
-      </span>
+      <span v-if="contentType !== 'city'" :class="$style._lighten"> {{ desc }}</span>
     </li>
 </template>
 
@@ -35,6 +30,14 @@
   export default {
     name: 'autocomplete-menu',
     props: ['contentType', 'item', 'isActive'],
+    computed: {
+      desc() {
+        let parents = ( 'parents' in this.item ) && this.item.parents;
+        if ( !!parents && parents[parents.length - 1]) {
+          return parents[parents.length - 1].typeShort + '. ' + parents[parents.length - 1].name;
+        }
+      }
+    },
     methods: {
       onSelect() {
         this.$emit('select', this.item);

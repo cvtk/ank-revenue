@@ -96,11 +96,15 @@ export default {
     },
 
     save: function(sale) {
-      console.log(sale);
       if ( !sale.key ) {
         sale.key = revenueRef.push().key;
       }
       return revenueRef.child(sale.key).update(sale);
+    },
+    remove: function(key) {
+      if ( typeof key !== 'undefined' ) {
+        return revenueRef.child(key).remove();
+      }
     },
 
     byCreated: function(range, onPage = 10) {
@@ -119,7 +123,7 @@ export default {
       else if ( _isDate(range.endAt) ) tmp.endAt = _toUnix(range.endAt)
       else tmp.endAt = _toUnix(new Date);
 
-      return revenueRef.orderByChild('created').endAt(tmp.endAt).startAt(tmp.startAt);
+      return revenueRef.orderByChild('created').startAt(tmp.startAt);
 
     }
   }

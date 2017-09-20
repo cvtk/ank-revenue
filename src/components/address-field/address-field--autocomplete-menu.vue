@@ -85,6 +85,7 @@
     methods: {
       onSelect(object) {
         this.focusedItem = 0;
+        delete object['parents'];
         this.$emit('select', object);
       },
       queryDelay: (function() {

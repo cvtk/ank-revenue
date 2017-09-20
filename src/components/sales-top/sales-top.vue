@@ -214,9 +214,9 @@
           case 'year': return 'В этом году продаж не было';
         }
       },
-      groupBy(arr, key) {
+      groupByEmployee(arr, key) {
         return arr.reduce(function(rv, x) {
-          (rv[x[key]] = rv[x[key]] || []).push(x);
+          (rv[x['employee']['name']] = rv[x['employee']['name']] || []).push(x);
           return rv;
         }, {});
       },
@@ -232,7 +232,7 @@
       },
 
       salesCallback(sales) {
-        let arrByEmployee = this.groupBy( h._objToArr(sales.val()), 'employee'),
+        let arrByEmployee = this.groupByEmployee( h._objToArr(sales.val())),
             arrBySum = [];
         this.results = { total: 0, group_1: 0, group_2: 0 };
 
@@ -240,11 +240,11 @@
 
           let sum = arrByEmployee[key].reduce( (sum, c) => sum + c.commission, 0 ),
               lastSale = arrByEmployee[key].length - 1,
-              group = arrByEmployee[key][lastSale].group;
+              group = arrByEmployee[key][lastSale].employee.group;
           
           arrBySum.push({ name: key, sum: sum, group: group  })
           this.results.total += sum;
-          if ( group === 'Офис 1' ) this.results.group_1 += sum
+          if ( group === 'Офис №1' ) this.results.group_1 += sum
           else this.results.group_2 += sum;
         }
         this.pages.current = 1;

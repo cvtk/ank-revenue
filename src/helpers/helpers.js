@@ -11,7 +11,19 @@ export default {
     }
     return copy;
   },
+  _saleType(type){
+    switch(type) {
+      case 'self': return 'Личная';
+      case 'employee': return 'Коллега';
+      case 'partner': return 'Партнер';
+      case 'participant': return 'Участник';
+    }
+  },
 
+  _toBool(value) {
+    if ( typeof(value) !== 'boolean' ) return value == 'true'
+    else return value;
+  },
   _moment(date) {
     return moment(date);
   },

@@ -126,7 +126,7 @@
     },
     methods: {
       onBlur(event) { this.fieldFocused = false; this.$emit('blur') },
-      onInput(event) { this.$emit('input', event.target.value ) }
+      onInput(event) { this.$emit('input', ( this.type === 'number' ) ? parseInt(event.target.value) : event.target.value ) }
     }
   }
 </script>

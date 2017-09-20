@@ -62,7 +62,7 @@
           <employee-field label="Сотрудник"
             v-model="newSale.employee"
             type="text"
-            :isDone="newSale.employee"
+            :isDone="newSale.employee.name"
             :needAttention="currentField === 'employee'"
           />
         </div>
@@ -70,15 +70,15 @@
           <div :class="$style.type">
             <span :class="$style.type__label">Тип сделки:</span>
             <div :class="$style.type__controls">
-              <default-radio v-model="newSale.type" small />
+              <default-radio v-model="newSale.type" small @input="newSale.partner.name = ''"/>
             </div>
           </div>
         </div>
         <div :class="$style.deal__partner" v-if="newSale.type.current === 'partner'">
           <default-field label="Контрагент"
-            v-model="newSale.partner"
+            v-model="newSale.partner.name"
             type="text"
-            :isDone="newSale.partner"
+            :isDone="!!newSale.partner.name"
             :needAttention="currentField === 'partner'"
           />
         </div>
@@ -86,7 +86,7 @@
           <employee-field label="Коллега"
             v-model="newSale.partner"
             type="text"
-            :isDone="newSale.partner"
+            :isDone="!!newSale.partner.name"
             :needAttention="currentField === 'partner'"
           />
         </div>
@@ -314,15 +314,6 @@
     id: '7600000100000',
     name: 'Ярославль',
     okato: '78401000000',
-    parents: [{
-      contentType: 'region',
-      id: '7600000000000',
-      name: 'Ярославская',
-      okato: '78000000000',
-      type: 'Область',
-      typeShort: 'обл',
-      zip: 150029
-    }],
     type: 'Город',
     typeShort: 'г',
     zip: 150029
@@ -350,8 +341,8 @@
           price: '',
           communal_included: false,
           commission: '',
-          partner: '',
-          employee: '',
+          partner: { name: '' },
+          employee: { name: '' },
           city: defaultCity,
           street: {},
           building: {},
@@ -365,6 +356,14 @@
         this.street = this.sale.street.name;
         this.building = this.sale.building.name;
         this.sale.created = new Date(this.sale.created * 1000);
+        this.sale.type = {
+            current: this.sale.type,
+            items: [
+              { label: 'личная', title: 'Личная продажа - 100%', value: 'self', isActive: true },
+              { label: 'коллега', title: 'Совместная с коллегой - 50/50%', value: 'employee', isActive: false },
+              { label: 'партнер', title: 'Совместная с партнером - 50%', value: 'partner', isActive: false }
+            ]
+          },
         this.newSale = this.sale;
       }
     },
@@ -376,7 +375,7 @@
         if ( this.newSale.room === '' ) return 'room';
         if ( this.newSale.created === '' ) return 'created';
         if ( this.newSale.employee === '' ) return 'employee';
-        if ( this.newSale.partner === '' ) return 'partner';
+        if ( this.newSale.type.current !== 'self' && this.newSale.partner === '' ) return 'partner';
         if ( this.newSale.price === '' ) return 'price';
         if ( this.newSale.commission === '' ) return 'commission';
         return 'complete';
@@ -384,53 +383,27 @@
     },
     methods: {
       onRemove(event) {
-        revenueRef.child(this.newSale.key).remove();
+        fireface.revenue.remove(this.newSale.key)
+          .then( () => console.log('Remove item'))
+          .catch( error => console.log( error ))
+
         this.$emit('save', true);
       },
 
       onSave(event) {
         if ( this.currentField === 'complete' ) {
-          let sale = {};
+          let sale = Object.assign( {}, this.newSale );
+          sale.type = sale.type.current;
+          sale.created = hlp._dateToUnix(sale.created);
+          sale.commission = ( sale.type !== 'self' && !sale.key ) ? Math.round(sale.commission / 2) : sale.commission;
 
-          ['city', 'street', 'building'].forEach( field => {
-            let obj = this.newSale[field],
-                str = [ obj.typeShort, obj.name ].join('. ');
-            sale[field] = str;
-          });
-
-          ['price', 'room', 'communal_included'].forEach( field => 
-            sale[field] = this.newSale[field]
-          );
-
-          sale.created = parseInt((new Date(this.newSale.created).getTime() / 1000).toFixed(0));
-
-          sale.employee = this.newSale.employee.name;
-          sale.employeeId = this.newSale.employee.key;
-          sale.group = this.newSale.employee.group;
-          sale.groupId = this.newSale.employee.groupId;
-          sale.type = this.newSale.type.current;
-          sale.partner = this.newSale.partner.name;
-          sale.partnerId = this.newSale.partner.key;
-          sale.partnerGroup = this.newSale.partner.group;
-          sale.partnerGroupId = this.newSale.partner.groupId;
-
-          if ( sale.type === 'self' ) {
-            sale.commission = this.newSale.commission;
-          } else if ( sale.type === 'employee' ) {
-              sale.commission = Math.round(this.newSale.commission / 2)
-              let partnerSale = hlp._objClone(sale);
-              partnerSale.employee = sale.partner;
-              partnerSale.employeeId = sale.partnerId;
-              partnerSale.group = sale.partnerGroup;
-              partnerSale.groupId = sale.partnerGroupId;
-              partnerSale.partner = sale.employee;
-              partnerSale.partnerId = sale.employeeId;
-              partnerSale.partnerGroup = sale.group;
-              partnerSale.partnerGroupId = sale.groupId;
-              fireface.revenue.save(partnerSale);
-          } else if ( sale.type === 'partner' ) {
-              sale.commission = Math.round(this.newSale.commission / 2);
+          if ( sale.type === 'employee' && !sale.key ) {
+              let colleagueSale = Object.assign( {}, sale );
+              colleagueSale.partner = Object.assign( {}, sale.employee );
+              colleagueSale.employee = Object.assign( {}, sale.partner );
+              fireface.revenue.save(colleagueSale);
           }
+          
           fireface.revenue.save(sale)
             .then( ()=> this.$emit('save') )
         }

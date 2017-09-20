@@ -70,6 +70,7 @@
   .wrapper__login {
     float: right;
     width: 50%;
+    text-align: right;
   }
 
   .login__messages { margin-top: 15px }
