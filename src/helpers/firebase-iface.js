@@ -82,6 +82,12 @@ export default {
     }
   },
   revenue: {
+    getEarliestDate(callback) {
+      return revenueRef.orderByChild('created').limitToFirst(1).once('value', sale => {
+        let obj = sale.val();
+        return callback(obj[Object.keys(obj)[0]].created)
+      });
+    },
     check: function(object) {
       let log = [];
       if ( typeof object === 'undefined' )

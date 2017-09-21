@@ -18,7 +18,9 @@
 
   .select {
     position: relative;
+    display: inline-block;
     padding-top: 12px;
+    width: 100%;
     &._done {
       .select__input { border-color: #32c5d2 }
       .select__label { color: #777 !important }

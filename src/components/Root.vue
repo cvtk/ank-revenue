@@ -13,8 +13,11 @@
       </div>
     </div>
     <div :class="$style._row">
-      <div :class="$style.root__portlet"></div>
-      <div :class="$style.root__portlet"></div>
+      <div :class="[ $style.root__portlet, $style._full ]">
+        <default-portlet label="Период к периоду" v-model="compareRange">
+          <compare-chart :range="compareRange.current" />
+        </default-portlet>
+      </div>
     </div>
   </div>
 </template>
@@ -28,6 +31,7 @@
     &:after { @include clearfix }
     margin-left: -15px;
     margin-right: -15px;
+    margin-bottom: 30px;
   }
 
   .root__portlet {
@@ -37,6 +41,7 @@
     min-height: 1px;
     padding-left: 15px;
     padding-right: 15px;
+    &._full { width: 100% }
   }
   
 </style>
@@ -45,11 +50,12 @@
 
   import DefaultPortlet from './default-portlet/default-portlet.vue';
   import DefaultChart from './default-chart/default-chart.vue';
+  import CompareChart from './compare-chart/compare-chart.vue';
   import SalesTop from './sales-top/sales-top.vue';
 
   export default {
     name: 'root',
-    components: { DefaultPortlet, DefaultChart, SalesTop },
+    components: { DefaultPortlet, DefaultChart, SalesTop, CompareChart },
     data() {
       return {
         salesRange: {
@@ -63,6 +69,16 @@
         },
 
         employeeRange: {
+          current: 'week',
+          items: [
+            { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
+            { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
+            { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
+            { label: 'Год', title: 'В текущем году', value: 'year', isActive: false }
+          ]
+        },
+
+        compareRange: {
           current: 'week',
           items: [
             { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
