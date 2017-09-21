@@ -15,6 +15,7 @@
     <td :class="$style.sales_row__column">{{ sale.type | _saleType }}</td>
     <td :class="$style.sales_row__column">{{ sale.partner.name }}</td>
     <td :class="$style.sales_row__column">{{ sale.employee.name }}</td>
+    <td :class="$style.sales_row__column">{{ sale.employee.group }}</td>
   </tr>
 </template>
 

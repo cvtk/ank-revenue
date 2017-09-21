@@ -113,6 +113,12 @@ export default {
       }
     },
 
+    byPeriod: function(startAt, endAt) {
+
+      return revenueRef.orderByChild('created').endAt(endAt).startAt(startAt);
+
+    },
+
     byCreated: function(range, onPage = 10) {
       let tmp = { startAt: 0, endAt: 0 };
       switch(range.startAt) {

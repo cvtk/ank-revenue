@@ -25,22 +25,28 @@
 <style lang="scss" module>
   @import "../assets/styles/mixins.scss";
 
-  .root { /* */ }
+  .root { 
+    @media (max-width: 992px) {
+      .root__portlet { width: 100% }
+    }
+  }
 
   ._row {
     &:after { @include clearfix }
     margin-left: -15px;
     margin-right: -15px;
-    margin-bottom: 30px;
   }
 
   .root__portlet {
+    &:after { @include clearfix }
     width: 50%;
     float: left;
     position: relative;
+    overflow: hidden;
     min-height: 1px;
     padding-left: 15px;
     padding-right: 15px;
+    margin-bottom: 45px;
     &._full { width: 100% }
   }
   
@@ -83,7 +89,6 @@
           items: [
             { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
             { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
-            { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
             { label: 'Год', title: 'В текущем году', value: 'year', isActive: false }
           ]
         }

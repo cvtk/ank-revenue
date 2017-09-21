@@ -60,6 +60,9 @@
 
             <th :class="[ $style.items_list__column, sortType === 'employee' && $style._active ]"
               @click="onChangeSortField('employee')">Сотрудник</th>
+
+            <th :class="[ $style.items_list__column, sortType === 'group' && $style._active ]"
+              @click="onChangeSortField('group')">Группа</th>
           </tr>
         </thead>
         <transition name="fade" appear>
@@ -326,6 +329,8 @@
             let st = this.sortType, a, b = '';
             if ( st === 'street' || st === 'employee' || st === 'partner' ) {
               a = fElement[st].name; b = sElement[st].name;
+            } else if ( st === 'group' ) {
+              a = fElement.employee[st]; b = sElement.employee[st];
             }
             else {
               a = fElement[st]; b = sElement[st];

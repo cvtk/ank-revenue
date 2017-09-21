@@ -78,33 +78,41 @@
       },
 
       salesCallback(sales) {
-        let days = { sum: [], date: [] };
+        let group_1 = { sum: [], dates: [] },
+            group_2 = { sum: [], dates: [] };
+
         this._iterateByDay(sales.val(), day => {
-          let sum = null,
-              date = null,
-              format = '';
+          let sum = { group_1: 0, group_2: 0}
+          day.forEach( (item ) => {
+            if ( item.employee.group === 'Офис №1') { sum.group_1 += item.commission }
+            else { sum.group_2 += item.commission }
+          });
+          let tmpdate = h._moment(day[0].created * 1000).format('DD.MM.YY'),
+              date = { group_1: tmpdate, group_2: tmpdate };
+          group_1.sum.push(sum.group_1);
+          group_1.dates.push(date.group_1);
 
-          switch(this.startAt) {
-            case 'week': format = 'ddd, MMM D'; break;
-            case 'all': format = 'DD.MM.YY'; break;
-            default: format = 'D MMM';
-          }
-
-          date = h._moment(day[0].created * 1000).format(format);
-          day.forEach( item => sum += item.commission );
-          days.sum.push(sum);
-          days.date.push(date);
+          group_2.sum.push(sum.group_2);
+          group_2.dates.push(date.group_2);
         });
+
         this.dataLoading = false;
         this.salesData = {
-          labels: days.date,
+          labels: group_1.dates,
           datasets: [
             {
-              label: 'Общие продажи',
-              backgroundColor: 'rgba(92, 155, 209, 0.3)',
-              borderColor: '#5C9BD1',
+              label: 'Офис №1',
+              backgroundColor: 'rgba(50, 197, 210, 0.3)',
+              borderColor: '#32c5d2',
               borderWidth: 1,
-              data: days.sum
+              data: group_1.sum
+            },
+            {
+              label: 'Офис №2',
+              backgroundColor: 'rgba(142, 68, 173, 0.3)',
+              borderColor: '#8e44ad',
+              borderWidth: 1,
+              data: group_2.sum
             }
           ]
         }

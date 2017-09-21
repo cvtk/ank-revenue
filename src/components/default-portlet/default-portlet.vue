@@ -18,7 +18,7 @@
   .portlet {
     background-color: #fff;
     padding: 12px 20px;
-    height: 475px;
+    min-height: 500px;
   }
   
   .portlet__header {
