@@ -84,7 +84,7 @@
         this._iterateByDay(sales.val(), day => {
           let sum = { group_1: 0, group_2: 0}
           day.forEach( (item ) => {
-            if ( item.employee.group === 'Офис №1') { sum.group_1 += item.commission }
+            if ( item.employee.group === 'Офис Чкалова') { sum.group_1 += item.commission }
             else { sum.group_2 += item.commission }
           });
           let tmpdate = h._moment(day[0].created * 1000).format('DD.MM.YY'),
@@ -101,14 +101,14 @@
           labels: group_1.dates,
           datasets: [
             {
-              label: 'Офис №1',
+              label: 'Офис Чкалова',
               backgroundColor: 'rgba(50, 197, 210, 0.3)',
               borderColor: '#32c5d2',
               borderWidth: 1,
               data: group_1.sum
             },
             {
-              label: 'Офис №2',
+              label: 'Офис Свердлова',
               backgroundColor: 'rgba(142, 68, 173, 0.3)',
               borderColor: '#8e44ad',
               borderWidth: 1,

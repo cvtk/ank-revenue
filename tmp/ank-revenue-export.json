@@ -1,0 +1,550 @@
+{
+  "employees" : {
+    "-KucdfDSazNTgL9Mu6gx" : {
+      "created" : 1506068046107,
+      "firstName" : "Настя",
+      "group" : "Офис Свердлова",
+      "groupId" : "hFlOtbCVddehsA",
+      "key" : "-KucdfDSazNTgL9Mu6gx",
+      "lastName" : "Ионеско"
+    },
+    "-KudJ0dGuNhlClw-tR7J" : {
+      "created" : 1506079152562,
+      "firstName" : "Ольга",
+      "group" : "Офис Свердлова",
+      "groupId" : "hFlOtbCVddehsA",
+      "key" : "-KudJ0dGuNhlClw-tR7J",
+      "lastName" : "Готка"
+    },
+    "-KudJfH2J_K2yIPV3PsV" : {
+      "created" : 1506079321287,
+      "firstName" : "Ирина",
+      "group" : "Офис Свердлова",
+      "groupId" : "hFlOtbCVddehsA",
+      "key" : "-KudJfH2J_K2yIPV3PsV",
+      "lastName" : "Бондарева"
+    },
+    "-KunbN6lNOyJcRv2s01L" : {
+      "created" : 1506251997852,
+      "firstName" : "Татьяна",
+      "group" : "Офис Чкалова",
+      "groupId" : "hGhuSlwAmNtB",
+      "key" : "-KunbN6lNOyJcRv2s01L",
+      "lastName" : "Калачева"
+    },
+    "-KunbeyOcx6Nn1up89HK" : {
+      "created" : 1506252075074,
+      "firstName" : "Светлана",
+      "group" : "Офис Чкалова",
+      "groupId" : "hGhuSlwAmNtB",
+      "key" : "-KunbeyOcx6Nn1up89HK",
+      "lastName" : "Борисова"
+    },
+    "-Kund-gUUjD-5AGDXkPO" : {
+      "created" : 1506252426187,
+      "firstName" : "Ирина",
+      "group" : "Офис Чкалова",
+      "groupId" : "hGhuSlwAmNtB",
+      "key" : "-Kund-gUUjD-5AGDXkPO",
+      "lastName" : "Кулагина"
+    },
+    "-Kunf4KVASLF3oOiTZ09" : {
+      "created" : 1506252969484,
+      "firstName" : "Юля",
+      "group" : "Офис Чкалова",
+      "groupId" : "hGhuSlwAmNtB",
+      "key" : "-Kunf4KVASLF3oOiTZ09",
+      "lastName" : "Иванова"
+    },
+    "-KunfIQThiK3HE3pQ35x" : {
+      "created" : 1506253027210,
+      "firstName" : "Наталья",
+      "group" : "Офис Чкалова",
+      "groupId" : "hGhuSlwAmNtB",
+      "key" : "-KunfIQThiK3HE3pQ35x",
+      "lastName" : "Данилова"
+    },
+    "-Kunfe1CS3uREc3r79CM" : {
+      "created" : 1506253119803,
+      "firstName" : "Елена",
+      "group" : "Офис Чкалова",
+      "groupId" : "hGhuSlwAmNtB",
+      "key" : "-Kunfe1CS3uREc3r79CM",
+      "lastName" : "Живова"
+    }
+  },
+  "groups" : {
+    "hFlOtbCVddehsA" : {
+      "key" : "hFlOtbCVddehsA",
+      "name" : "Офис Свердлова"
+    },
+    "hGhuSlwAmNtB" : {
+      "key" : "hGhuSlwAmNtB",
+      "name" : "Офис Чкалова"
+    }
+  },
+  "revenue" : {
+    "-KudJTMI_IUsWeLNFJV1" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100003060001",
+        "name" : "17а",
+        "okato" : "78401380000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150043
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 3500,
+      "communal_included" : false,
+      "created" : 1504437480,
+      "employee" : {
+        "group" : "Офис Свердлова",
+        "groupId" : "hFlOtbCVddehsA",
+        "key" : "-KucdfDSazNTgL9Mu6gx",
+        "name" : "Ионеско Настя"
+      },
+      "key" : "-KudJTMI_IUsWeLNFJV1",
+      "partner" : {
+        "group" : "Офис Свердлова",
+        "groupId" : "hFlOtbCVddehsA",
+        "key" : "-KudJ0dGuNhlClw-tR7J",
+        "name" : "Готка Ольга"
+      },
+      "price" : 8000,
+      "room" : 1,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000030600",
+        "name" : "Карла Либкнехта",
+        "okato" : "78401380000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150043
+      },
+      "type" : "employee"
+    },
+    "-KudJTNHHWQZ9icbJUc2" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100003060001",
+        "name" : "17а",
+        "okato" : "78401380000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150043
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 3500,
+      "communal_included" : false,
+      "created" : 1504437480,
+      "employee" : {
+        "group" : "Офис Свердлова",
+        "groupId" : "hFlOtbCVddehsA",
+        "key" : "-KudJ0dGuNhlClw-tR7J",
+        "name" : "Готка Ольга"
+      },
+      "key" : "-KudJTNHHWQZ9icbJUc2",
+      "partner" : {
+        "group" : "Офис Свердлова",
+        "groupId" : "hFlOtbCVddehsA",
+        "key" : "-KucdfDSazNTgL9Mu6gx",
+        "name" : "Ионеско Настя"
+      },
+      "price" : 8000,
+      "room" : 1,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000030600",
+        "name" : "Карла Либкнехта",
+        "okato" : "78401380000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150043
+      },
+      "type" : "employee"
+    },
+    "-KunbQzdHrAwmDwB7Hkn" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100006510001",
+        "name" : "7к2",
+        "okato" : "78401387000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150030
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 4500,
+      "communal_included" : true,
+      "created" : 1477998900,
+      "employee" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-KunbN6lNOyJcRv2s01L",
+        "name" : "Калачева Татьяна"
+      },
+      "key" : "-KunbQzdHrAwmDwB7Hkn",
+      "partner" : {
+        "name" : "Олд сити"
+      },
+      "price" : 13000,
+      "room" : 1,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000065100",
+        "name" : "Пожарского",
+        "okato" : "78401387000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150030
+      },
+      "type" : "partner"
+    },
+    "-Kunc7k9L4TV7FrcAgCB" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100004550002",
+        "name" : "3",
+        "okato" : "78401387000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150057
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 2800,
+      "communal_included" : false,
+      "created" : 1478085420,
+      "employee" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-KunbeyOcx6Nn1up89HK",
+        "name" : "Борисова Светлана"
+      },
+      "key" : "-Kunc7k9L4TV7FrcAgCB",
+      "partner" : {
+        "name" : "Метро"
+      },
+      "price" : 8000,
+      "room" : 1,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000045500",
+        "name" : "Матросова",
+        "okato" : "78401387000",
+        "type" : "Проезд",
+        "typeShort" : "проезд",
+        "zip" : 150057
+      },
+      "type" : "partner"
+    },
+    "-KundHb0zaSh6AIytE3Q" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100003140004",
+        "name" : "4",
+        "okato" : "78401364000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150008
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 3000,
+      "communal_included" : false,
+      "created" : 1477999380,
+      "employee" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-Kund-gUUjD-5AGDXkPO",
+        "name" : "Кулагина Ирина"
+      },
+      "key" : "-KundHb0zaSh6AIytE3Q",
+      "partner" : {
+        "name" : "Качество жизни"
+      },
+      "price" : 9000,
+      "room" : 1,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000031400",
+        "name" : "Клубная",
+        "okato" : "78401364000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150008
+      },
+      "type" : "partner"
+    },
+    "-Kunf9NuD5cu1sgModBn" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100002800001",
+        "name" : "5",
+        "okato" : "78401373000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150023
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 4500,
+      "communal_included" : true,
+      "created" : 1504434600,
+      "employee" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-Kunf4KVASLF3oOiTZ09",
+        "name" : "Иванова Юля"
+      },
+      "key" : "-Kunf9NuD5cu1sgModBn",
+      "partner" : {
+        "name" : ""
+      },
+      "price" : 4500,
+      "room" : 1,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000028000",
+        "name" : "Зелинского",
+        "okato" : "78401373000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150023
+      },
+      "type" : "self"
+    },
+    "-KunfQjfBgP2K8EAeD6O" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100000210001",
+        "name" : "67б",
+        "okato" : "78401380000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150031
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 4000,
+      "communal_included" : true,
+      "created" : 1504261980,
+      "employee" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-KunfIQThiK3HE3pQ35x",
+        "name" : "Данилова Наталья"
+      },
+      "key" : "-KunfQjfBgP2K8EAeD6O",
+      "partner" : {
+        "name" : ""
+      },
+      "price" : 5000,
+      "room" : 1,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000002100",
+        "name" : "Автозаводская",
+        "okato" : "78401380000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150031
+      },
+      "type" : "self"
+    },
+    "-Kunfv5X1FamY73nh_bv" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100010870006",
+        "name" : "19",
+        "okato" : "78401380000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150047
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 4800,
+      "communal_included" : true,
+      "created" : 1504262100,
+      "employee" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-Kund-gUUjD-5AGDXkPO",
+        "name" : "Кулагина Ирина"
+      },
+      "key" : "-Kunfv5X1FamY73nh_bv",
+      "partner" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-Kunfe1CS3uREc3r79CM",
+        "name" : "Живова Елена"
+      },
+      "price" : 12000,
+      "room" : 2,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000108700",
+        "name" : "Чкалова",
+        "okato" : "78401380000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150043
+      },
+      "type" : "employee"
+    },
+    "-Kunfv5d4RO9WRCtZenW" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100010870006",
+        "name" : "19",
+        "okato" : "78401380000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150047
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 4800,
+      "communal_included" : true,
+      "created" : 1504262100,
+      "employee" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-Kunfe1CS3uREc3r79CM",
+        "name" : "Живова Елена"
+      },
+      "key" : "-Kunfv5d4RO9WRCtZenW",
+      "partner" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-Kund-gUUjD-5AGDXkPO",
+        "name" : "Кулагина Ирина"
+      },
+      "price" : 12000,
+      "room" : 2,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000108700",
+        "name" : "Чкалова",
+        "okato" : "78401380000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150043
+      },
+      "type" : "employee"
+    },
+    "-KungKBTLmGzQd9a-1k2" : {
+      "building" : {
+        "contentType" : "building",
+        "id" : "7600000100001240002",
+        "name" : "43",
+        "okato" : "78401362000",
+        "type" : "дом",
+        "typeShort" : "д",
+        "zip" : 150060
+      },
+      "city" : {
+        "contentType" : "city",
+        "id" : "7600000100000",
+        "name" : "Ярославль",
+        "okato" : "78401000000",
+        "type" : "Город",
+        "typeShort" : "г",
+        "zip" : 150029
+      },
+      "commission" : 4000,
+      "communal_included" : false,
+      "created" : 1504348620,
+      "employee" : {
+        "group" : "Офис Чкалова",
+        "groupId" : "hGhuSlwAmNtB",
+        "key" : "-Kunfe1CS3uREc3r79CM",
+        "name" : "Живова Елена"
+      },
+      "key" : "-KungKBTLmGzQd9a-1k2",
+      "partner" : {
+        "name" : "Центр обмена и аренды"
+      },
+      "price" : 10000,
+      "room" : 2,
+      "street" : {
+        "contentType" : "street",
+        "id" : "76000001000012400",
+        "name" : "Волгоградская",
+        "okato" : "78401362000",
+        "type" : "Улица",
+        "typeShort" : "ул",
+        "zip" : 150063
+      },
+      "type" : "partner"
+    }
+  }
+}

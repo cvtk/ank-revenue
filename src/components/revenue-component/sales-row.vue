@@ -4,8 +4,8 @@
     <td :class="$style.sales_row__column">
       {{ sale.city.typeShort }}. {{ sale.city.name }},
       {{ sale.street.typeShort }}. {{ sale.street.name }},
-      {{ sale.building.typeShort }}. {{ sale.building.name }},
-      кв. {{ sale.room }}
+      {{ sale.building.typeShort }}. {{ sale.building.name }}
+      (комнат: {{ sale.room }})
     </td>
     <td :class="$style.sales_row__column">
       {{ sale.price | _priceFormat }}<span :class="$style.ruble_icon"></span>

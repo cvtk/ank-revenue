@@ -275,10 +275,10 @@
         showModal: false,
         currentRef: '',
         startAtRange: {
-          current: 'week',
+          current: 'month',
           items: [
-            { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: true },
-            { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: false },
+            { label: 'Неделя', title: 'На этой неделе', value: 'week', isActive: false },
+            { label: 'Месяц', title: 'За текущий месяц', value: 'month', isActive: true },
             { label: 'Квартал', title: 'В этом квартале', value: 'quarter', isActive: false },
             { label: 'Год', title: 'В текущем году', value: 'year', isActive: false },
             { label: 'Все', title: 'За все время', value: 'all', isActive: false }

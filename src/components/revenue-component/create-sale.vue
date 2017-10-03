@@ -30,7 +30,7 @@
           />
         </div>
         <div :class="$style.address__room">
-          <default-field label="Квартира"
+          <default-field label="Комнат"
             v-model="newSale.room"
             type="number"
             min="1"
@@ -327,15 +327,15 @@
       return {
         city: 'Ярославль', street: '', building: '',
         type: {
-          current: 'self',
+          current: '',
           items: [
-            { label: 'личная', title: 'Личная продажа - 100%', value: 'self', isActive: true },
+            { label: 'личная', title: 'Личная продажа - 100%', value: 'self', isActive: false },
             { label: 'коллега', title: 'Совместная с коллегой - 50/50%', value: 'employee', isActive: false },
             { label: 'партнер', title: 'Совместная с партнером - 50%', value: 'partner', isActive: false }
           ]
         },
         newSale: {
-          type: 'self',
+          type: '',
           created: new Date(),
           key: '',
           price: '',
@@ -368,6 +368,7 @@
         if ( this.newSale.room === '' ) return 'room';
         if ( this.newSale.created === '' ) return 'created';
         if ( this.newSale.employee.name === '' ) return 'employee';
+        if ( !this.newSale.type ) return 'type';
         if ( this.newSale.type !== 'self' && this.newSale.partner.name === '' ) return 'partner';
         if ( this.newSale.price === '' ) return 'price';
         if ( this.newSale.commission === '' ) return 'commission';

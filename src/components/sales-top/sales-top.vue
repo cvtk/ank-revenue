@@ -11,13 +11,13 @@
         </div>
         <div :class="$style.results__item">
           <div :class="$style.item">
-            <div :class="$style.item__title">Группа №1</div>
+            <div :class="$style.item__title">Офис Чкалова</div>
             <div :class="$style.item__value_group_1">{{ results.group_1 | _priceFormat }}<span :class="$style.ruble"></span></div>
           </div>
         </div>
         <div :class="$style.results__item">
           <div :class="$style.item">
-            <div :class="$style.item__title">Группа №2</div>
+            <div :class="$style.item__title">Офис Свердлова</div>
             <div :class="$style.item__value_group_2">{{ results.group_2 | _priceFormat }}<span :class="$style.ruble"></span></div>
           </div>
         </div>
@@ -244,7 +244,7 @@
           
           arrBySum.push({ name: key, sum: sum, group: group  })
           this.results.total += sum;
-          if ( group === 'Офис №1' ) this.results.group_1 += sum
+          if ( group === 'Офис Чкалова' ) this.results.group_1 += sum
           else this.results.group_2 += sum;
         }
         this.pages.current = 1;

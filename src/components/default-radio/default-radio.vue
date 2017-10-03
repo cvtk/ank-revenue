@@ -64,7 +64,7 @@
     },
     data() {
       return {
-        current: 0,
+        current: null,
         local : this.value
       }
     },
@@ -75,10 +75,11 @@
     },
     methods: {
       onClick(index) {
+        this.current = index;
         this.local.items[this.current].isActive = false;
         this.local.items[index].isActive = true;
         this.local.current = this.local.items[index].value;
-        this.current = index;
+        
         this.$emit('input', this.local);
       }
     }
