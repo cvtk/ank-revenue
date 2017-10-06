@@ -205,7 +205,15 @@
           tmp.push( obj )
         });
 
-        this.employees = tmp.reverse();
+        // this.employees = tmp.reverse();
+        this.employees = tmp.sort( (a, b) => {
+          let aname = a.lastName.toLowerCase(),
+              bname = b.lastName.toLowerCase();
+          if(aname < bname) return -1;
+          if(aname > bname) return 1;
+
+          return 0;
+        });
         this.pages.itemsCount = this.employees.length;
       });
 
@@ -251,8 +259,8 @@
           groupId: this.groupId,
           group: this.group
         })
-        .then(function() {
-          
+        .then( () => {
+          this.firstName = ''; this.lastName = ''; this.groupId = ''; this.group = '';
         })
         .catch(function(error) {
           console.log("Save failed: " + error.message)

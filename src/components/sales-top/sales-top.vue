@@ -100,7 +100,7 @@
     text-align: center;
   }
 
-  .top__employees { height: 280px }
+  .top__employees { position: relative }
 
   .employees {
     border: none;
@@ -183,7 +183,7 @@
         employees: {},
         pages: {
           current: 1,
-          itemsPerPage: 7,
+          itemsPerPage: 10,
           itemsCount: 10
         }
       }

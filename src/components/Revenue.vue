@@ -264,7 +264,7 @@
 
     data() {
       return {
-        pages: { current: 1, itemsPerPage: 10, itemsCount: 10 },
+        pages: { current: 1, itemsPerPage: 20, itemsCount: 10 },
         dataLoading: false,
         sortSearch: '',
         sortType: 'created',

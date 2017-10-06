@@ -336,7 +336,7 @@
         },
         newSale: {
           type: '',
-          created: new Date(),
+          created: '',
           key: '',
           price: '',
           communal_included: false,

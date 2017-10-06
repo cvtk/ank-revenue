@@ -1,18 +1,13 @@
 # ank-revenue
 
-> A Vue.js project
+06.10.2017
 
-## Build Setup
+-- В создании сделки: убрана дата по умолчанию.
 
-``` bash
-# install dependencies
-npm install
+-- В создании сотрудника: после сохранения нового сотрудника обнуляются переменные (повторно не сохранить).
 
-# serve with hot reload at localhost:8080
-npm run dev
+-- В создании сотрудника: список сотрудников теперь сортируется в алфавитном порядке, а не по дате создания.
 
-# build for production with minification
-npm run build
-```
+-- В продажах: количество сделок в списке увеличено до 20 шт.
 
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+-- На главной в панели Сотрудники: топ сотрудников увеличен с 7 до 10 шт.
