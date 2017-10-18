@@ -8,7 +8,7 @@
       </div>
       <div :class="$style.root__portlet">
         <default-portlet label="Сотрудники" v-model="employeeRange">
-          <sales-top :startAt="employeeRange.current" />
+          <sales-top :type="employeeRange.current" />
         </default-portlet>
       </div>
     </div>

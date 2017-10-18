@@ -1,6 +1,12 @@
 <template>
   <div :class="$style.top">
     <default-loader v-if="dataLoading" />
+    <div :class="$style.top__period">
+      <default-select :options="currentPeriods" name-field="name" @change="onPeriodChange"
+        label="Период"
+        :isDone="!!currentPeriods.length"
+      />
+    </div>
     <div :class="$style.top__results">
       <div :class="$style.results">
         <div :class="$style.results__item">
@@ -56,6 +62,12 @@
   .top {
     position: relative;
   }
+
+  .top__period {
+    position: relative;
+    margin-bottom: 15px;
+  }
+
   .top__results {
     position: relative;
     margin-bottom: 15px;
@@ -164,16 +176,16 @@
 <script>
   import DefaultPagination from '../default-pagination/default-pagination.vue';
   import DefaultLoader from '../default-loader/default-loader.vue';
+  import DefaultSelect from '../default-select/default-select.vue';
   import fireface from '../../helpers/firebase-iface.js';
   import h from '../../helpers/helpers.js';
 
   export default {
     name: 'sales-top',
     filters: h,
-    components: { DefaultPagination, DefaultLoader },
+    components: { DefaultPagination, DefaultLoader, DefaultSelect },
     props: {
-      startAt: { default: 'week', type: String },
-      endAt() { return { default: new Date, type: Date } }
+      type: { default: 'week', type: String }
     },
     data() {
       return {
@@ -181,6 +193,9 @@
         dataLoading: true,
         currentRef: null,
         employees: {},
+        currentPeriods: [{name: ''}, {name: ''}],
+        startAt: '',
+        endAt: '',
         pages: {
           current: 1,
           itemsPerPage: 10,
@@ -201,11 +216,20 @@
       }
     },
     watch: {
-      startAt(value) {
+      type(value) {
         this.salesRemount();
       }
     },
     methods: {
+      onPeriodChange(index) {
+        this.dataLoading = true;
+        if ( this.currentRef ) {
+          this.currentRef.off( 'value', this.salesCallback );
+        }
+        this.currentRef = fireface.revenue.byPeriod(this.currentPeriods[index].startAt, this.currentPeriods[index].endAt);
+        this.currentRef.on( 'value', this.salesCallback );
+      },
+
       getEmptyMessage() {
         switch(this.startAt) {
           case 'week': return 'На этой неделе продаж не было';
@@ -223,12 +247,33 @@
 
       salesRemount() {
         this.dataLoading = true;
-        let range = { startAt: this.startAt, endAt: this.endAt };
-        if ( this.currentRef ) {
-          this.currentRef.off( 'value', this.salesCallback );
+        let type = this.type, format = '', p = '';
+
+        switch(this.type) {
+          case 'week': { format = 'wo неделя, YYYY'; p = 'w'; }; break;
+          case 'month': { format = 'MMMM, YYYY'; p = 'M'; }; break;
+          case 'quarter': { format = 'Q кв. YYYY'; p = 'Q'; }; break;
+          case 'year': { format =  'YYYY'; p = 'y'; }; break;
         }
-        this.currentRef = fireface.revenue.byCreated(range);
-        this.currentRef.on( 'value', this.salesCallback );
+
+        fireface.revenue.getEarliestDate( unix => {
+          let startDate = h._moment(unix * 1000);
+          let now = h._moment().startOf('day');
+          let startAt = startDate.clone().startOf(type).add(0, p);
+          let months = [];
+
+          while (startAt.isBefore(now)) {
+              let startOf = startAt.startOf('day'),
+                  endOf = h._moment(startAt).endOf(type),
+                  name = startAt.format(format) + ' ( ' + startOf.format('DD.MM') + ' - ' + endOf.format('DD.MM') + ' )';
+
+              months.push({ name: name, startAt: startOf.unix(), endAt: endOf.unix() });
+              startAt.add(1, p);
+          }
+          this.currentPeriods = months.reverse();
+          this.onPeriodChange(0);
+          this.dataLoading = false;
+        })
       },
 
       salesCallback(sales) {
